@@ -8,7 +8,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:url_launcher/url_launcher.dart';
 
-void main() => runApp(MaterialApp(home: MyHome()));
+void main() => runApp(MaterialApp(
+      home: MyHome(),
+      debugShowCheckedModeBanner: false,
+      debugShowMaterialGrid: false,
+    ));
 
 class MyHome extends StatefulWidget {
   @override
@@ -52,7 +56,6 @@ class _MyHomeState extends State<MyHome> {
         prefs.getString('textPort') ?? _textPortController.text;
     _textIceServersController.text =
         prefs.getString('textIceServers') ?? _textIceServersController.text;
-    print('Loaded user inputs value.');
   }
 
   Future<void> _saveSharedPref() async {
@@ -61,7 +64,6 @@ class _MyHomeState extends State<MyHome> {
     await prefs.setString('textSecret', _textSecretController.text);
     await prefs.setString('textPort', _textPortController.text);
     await prefs.setString('textIceServers', _textIceServersController.text);
-    print('Saved user inputs values.');
   }
 
   Future<void> _liveConn() async {
@@ -93,8 +95,7 @@ class _MyHomeState extends State<MyHome> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar:
-          AppBar(title: const Text('Flutter openVidu demo'), actions: <Widget>[
+      appBar: AppBar(title: const Text('Flutter OpenVidu'), actions: <Widget>[
         Row(children: <Widget>[
           isOnline
               ? const Image(
@@ -109,32 +110,6 @@ class _MyHomeState extends State<MyHome> {
                 ),
         ]),
       ]),
-      drawer: Drawer(
-          child: ListView(
-        children: <Widget>[
-          const ListTile(
-            leading: CircleAvatar(
-                backgroundImage: AssetImage('assets/imgs/openvidu_logo.png')),
-            title: Text("Flutter openVidu demo"),
-            subtitle: Text("v 1.0.0"),
-          ),
-          ListTile(
-              leading: const Icon(Icons.home),
-              title: const Text("Home"),
-              onTap: () {
-                Navigator.of(context).pop();
-              }),
-          InkWell(
-              child: const ListTile(
-                  leading: Icon(Icons.insert_link), title: Text("GitHub")),
-              onTap: () =>
-                  launch('https://github.com/cyb3rcod3/flutter-openvidu-demo')),
-          InkWell(
-              child: const ListTile(
-                  leading: Icon(Icons.insert_link), title: Text("openVidu")),
-              onTap: () => launch('https://openvidu.io')),
-        ],
-      )),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(10.0),
         child: Center(
@@ -148,8 +123,8 @@ class _MyHomeState extends State<MyHome> {
                 decoration: const InputDecoration(
                     contentPadding: EdgeInsets.all(5),
                     border: OutlineInputBorder(),
-                    labelText: 'Session room name',
-                    hintText: 'Enter session room name'),
+                    labelText: 'Session name',
+                    hintText: 'Enter session name'),
               ),
               const SizedBox(height: 10),
               TextField(
@@ -166,8 +141,8 @@ class _MyHomeState extends State<MyHome> {
                 decoration: const InputDecoration(
                     contentPadding: EdgeInsets.all(5),
                     border: OutlineInputBorder(),
-                    labelText: 'openVidu server url',
-                    hintText: 'Enter openVidu server url'),
+                    labelText: 'OpenVidu server url',
+                    hintText: 'Enter OpenVidu server url'),
               ),
               const SizedBox(height: 10),
               TextField(
@@ -175,8 +150,8 @@ class _MyHomeState extends State<MyHome> {
                 decoration: const InputDecoration(
                     contentPadding: EdgeInsets.all(5),
                     border: OutlineInputBorder(),
-                    labelText: 'openVidu server port',
-                    hintText: 'Enter openVidu server port'),
+                    labelText: 'OpenVidu server port',
+                    hintText: 'Enter OpenVidu server port'),
               ),
               const SizedBox(height: 10),
               TextField(
@@ -184,8 +159,8 @@ class _MyHomeState extends State<MyHome> {
                 decoration: const InputDecoration(
                     contentPadding: EdgeInsets.all(5),
                     border: OutlineInputBorder(),
-                    labelText: 'openVidu server secret',
-                    hintText: 'Enter openVidu server secret'),
+                    labelText: 'OpenVidu server secret',
+                    hintText: 'Enter OpenVidu server secret'),
               ),
               const SizedBox(height: 10),
               TextField(
@@ -204,7 +179,7 @@ class _MyHomeState extends State<MyHome> {
                 color: Colors.green[400],
                 disabledColor: Colors.grey,
                 onPressed: isOnline
-                    ? () => Navigator.push(context,
+                    ? () => Navigator.pushReplacement(context,
                             MaterialPageRoute(builder: (context) {
                           _saveSharedPref();
                           return VideocallWidget(
@@ -218,7 +193,7 @@ class _MyHomeState extends State<MyHome> {
                         }))
                     : null,
                 child: Text(
-                  isOnline ? 'JoinRoom' : '   Offline  ',
+                  isOnline ? 'Join' : 'Offline',
                   style: const TextStyle(fontSize: 20.0),
                 ),
               ),

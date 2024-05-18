@@ -4,7 +4,7 @@ import 'package:openviduflutter/participant/local-participant.dart';
 import 'package:openviduflutter/participant/remote-participant.dart';
 import 'package:openviduflutter/utils/custom-websocket.dart';
 
-typedef void OnSetRemoteMediaStreamEvent(MediaStream remoteStream);
+typedef void OnSetRemoteMediaStreamEvent(String id, MediaStream remoteStream);
 typedef void OnRemoveRemoteParticipantEvent(String id);
 
 class Session {
@@ -161,6 +161,6 @@ class Session {
   void _setRemoteMediaStream(
       MediaStream stream, RemoteParticipant participant) {
     participant.mediaStream = stream;
-    onSetRemoteMediaStream!(stream);
+    onSetRemoteMediaStream!(participant.connectionId!, stream);
   }
 }

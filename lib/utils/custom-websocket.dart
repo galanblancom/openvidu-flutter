@@ -9,6 +9,8 @@ import 'package:openviduflutter/participant/remote-participant.dart';
 import 'package:openviduflutter/utils/pair.dart';
 import 'session.dart'; // Assuming you have a Session class implemented
 
+typedef void OnErrorEvent(String error);
+
 class CustomWebSocket {
   final String tag = "CustomWebSocketListener";
   final int pingMessageInterval = 5;
@@ -25,6 +27,7 @@ class CustomWebSocket {
   final Map<int, String> idsReceiveVideo = {};
   final Set<int> idsOnIceCandidate = <int>{};
   String? mediaServer;
+  OnErrorEvent? onErrorEvent;
 
   CustomWebSocket(this.session);
 
@@ -323,7 +326,7 @@ class CustomWebSocket {
     if (participantJson.containsKey(JsonConstants.metadata)) {
       final metadata = participantJson[JsonConstants.metadata];
       try {
-        final json = metadata;
+        final json = jsonDecode(metadata);
         final clientData = json['clientData'];
         if (clientData != null) {
           participantName = clientData;
@@ -383,12 +386,15 @@ class CustomWebSocket {
   }
 
   void onError(String error) {
-    print('Error: $error');
     /*if (context.mounted) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(error)));
       // session.leaveSession(); // Assuming you have a leaveSession method in session
     }*/
+    if (onErrorEvent != null) {
+      onErrorEvent!(error);
+    }
+
     session
         .leaveSession(); // Assuming you have a leaveSession method in session
   }
