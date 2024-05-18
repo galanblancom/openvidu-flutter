@@ -1,4 +1,4 @@
-# openvidutest
+# openvidu-flutter
 
 A new Flutter project.
 
