@@ -4,9 +4,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:openvidutest/constants/json-constants.dart';
-import 'package:openvidutest/participant/remote-participant.dart';
-import 'package:openvidutest/utils/pair.dart';
+import 'package:openviduflutter/constants/json-constants.dart';
+import 'package:openviduflutter/participant/remote-participant.dart';
+import 'package:openviduflutter/utils/pair.dart';
 import 'session.dart'; // Assuming you have a Session class implemented
 
 class CustomWebSocket {

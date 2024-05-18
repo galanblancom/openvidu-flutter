@@ -1,4 +1,4 @@
-import 'package:openvidutest/utils/session.dart';
+import 'package:openviduflutter/utils/session.dart';
 import 'participant.dart';
 
 class RemoteParticipant extends Participant {

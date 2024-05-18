@@ -1,4 +1,4 @@
-package com.example.openvidutest
+package com.example.openviduflutter
 
 import io.flutter.embedding.android.FlutterActivity
 

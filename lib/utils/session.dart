@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:openvidutest/participant/local-participant.dart';
-import 'package:openvidutest/participant/remote-participant.dart';
-import 'package:openvidutest/utils/custom-websocket.dart';
+import 'package:openviduflutter/participant/local-participant.dart';
+import 'package:openviduflutter/participant/remote-participant.dart';
+import 'package:openviduflutter/utils/custom-websocket.dart';
 
 typedef void OnSetRemoteMediaStreamEvent(MediaStream remoteStream);
 typedef void OnRemoveRemoteParticipantEvent(String id);
@@ -149,17 +149,13 @@ class Session {
   }
 
   void leaveSession() async {
-    //websocket.setWebsocketCancelled(true);
     websocket.leaveRoom();
     await websocket.disconnect();
-
     localParticipant!.dispose();
 
     for (var remoteParticipant in remoteParticipants.values) {
       remoteParticipant.peerConnection?.close();
     }
-
-    //await rendererFactory.dispose();
   }
 
   void _setRemoteMediaStream(

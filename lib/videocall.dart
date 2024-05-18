@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:openvidutest/api/api-service.dart';
-import 'package:openvidutest/participant/local-participant.dart';
-import 'package:openvidutest/participant/remote-participant.dart';
-import 'package:openvidutest/utils/custom-websocket.dart';
-import 'package:openvidutest/utils/session.dart';
+import 'package:openviduflutter/api/api-service.dart';
+import 'package:openviduflutter/participant/local-participant.dart';
+import 'package:openviduflutter/utils/custom-websocket.dart';
+import 'package:openviduflutter/utils/session.dart';
 
 class VideocallWidget extends StatefulWidget {
   const VideocallWidget({
@@ -31,9 +29,9 @@ class _VideocallWidgetState extends State<VideocallWidget> {
   final _localRenderer = RTCVideoRenderer();
   final _remoteRenderer = RTCVideoRenderer();
 
+  bool mutedMic = false;
   late ApiService apiService;
   Session? session;
-  //Signaling? _signaling;
 
   @override
   void initState() {
@@ -57,11 +55,14 @@ class _VideocallWidgetState extends State<VideocallWidget> {
   }
 
   void _switchCamera() {
-    //_signaling?.switchCamera();
+    session?.localParticipant?.switchCamera();
   }
 
   void _muteMic() {
-    //_signaling?.muteMic();
+    session?.localParticipant?.muteMic();
+    setState(() {
+      mutedMic = !mutedMic;
+    });
   }
 
   @override
@@ -114,7 +115,12 @@ class _VideocallWidgetState extends State<VideocallWidget> {
                 FloatingActionButton(
                   onPressed: _muteMic,
                   heroTag: "btn_muteMic",
-                  child: const Icon(Icons.mic_off),
+                  backgroundColor: mutedMic
+                      ? const Color.fromARGB(255, 181, 178, 178)
+                      : null,
+                  child: mutedMic
+                      ? const Icon(Icons.mic_off)
+                      : const Icon(Icons.mic),
                 )
               ])),
     );
@@ -124,7 +130,6 @@ class _VideocallWidgetState extends State<VideocallWidget> {
   void dispose() {
     super.dispose();
     session?.leaveSession();
-    //_signaling?.close();
     _localRenderer.dispose();
     _remoteRenderer.dispose();
   }
@@ -152,7 +157,7 @@ class _VideocallWidgetState extends State<VideocallWidget> {
 
         var localParticipant = LocalParticipant(widget.userName, session!);
         localParticipant.startLocalCamera().then((stream) => setState(() {
-              _localRenderer.srcObject = localParticipant.localStream;
+              _localRenderer.srcObject = localParticipant.mediaStream;
             }));
 
         startWebSocket();

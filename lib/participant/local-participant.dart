@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:openvidutest/utils/session.dart';
+import 'package:openviduflutter/utils/session.dart';
 import 'participant.dart';
 
 class LocalParticipant extends Participant {
-  late MediaStream localStream;
   List<RTCIceCandidate> localIceCandidates = [];
   RTCSessionDescription? localSessionDescription;
 
@@ -28,13 +27,6 @@ class LocalParticipant extends Participant {
   RTCSessionDescription? getLocalSessionDescription() {
     return localSessionDescription;
   }
-/*
-  @override
-  Future<void> dispose() async {
-    super.dispose();
-    localRenderer.srcObject = null;
-    localStream.dispose();
-  }*/
 
   Future<MediaStream> startLocalCamera() async {
     final Map<String, dynamic> mediaConstraints = {
@@ -49,13 +41,25 @@ class LocalParticipant extends Participant {
         'optional': [],
       }
     };
-    localStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
-    localStream.getAudioTracks().forEach((track) {
+    mediaStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
+    mediaStream!.getAudioTracks().forEach((track) {
       audioTrack = track;
     });
-    localStream.getVideoTracks().forEach((track) {
+    mediaStream!.getVideoTracks().forEach((track) {
       videoTrack = track;
     });
-    return localStream;
+    return mediaStream!;
+  }
+
+  switchCamera() {
+    if (videoTrack != null) {
+      Helper.switchCamera(videoTrack!);
+    }
+  }
+
+  muteMic() {
+    if (audioTrack != null) {
+      audioTrack!.enabled = !audioTrack!.enabled;
+    }
   }
 }

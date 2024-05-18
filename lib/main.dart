@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:openvidutest/videocall.dart';
+import 'package:openviduflutter/videocall.dart';
 import 'dart:math';
 import 'dart:io';
 import 'dart:async';
