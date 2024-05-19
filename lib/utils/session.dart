@@ -161,6 +161,8 @@ class Session {
   void _setRemoteMediaStream(
       MediaStream stream, RemoteParticipant participant) {
     participant.mediaStream = stream;
+    participant.isAudioActive = stream.getAudioTracks().first.enabled;
+    participant.isCameraActive = stream.getVideoTracks().first.enabled;
     onSetRemoteMediaStream!(participant.connectionId!, stream);
   }
 }

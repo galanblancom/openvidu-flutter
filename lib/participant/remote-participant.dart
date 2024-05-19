@@ -7,4 +7,20 @@ class RemoteParticipant extends Participant {
       : super.withConnectionId(connectionId, participantName, session) {
     session.addRemoteParticipant(this);
   }
+
+  changeCameraStatus(bool newValue) {
+    mediaStream?.getVideoTracks().forEach((element) {
+      element.enabled = newValue;
+    });
+
+    isCameraActive = newValue;
+  }
+
+  changeMicrophoneStatus(bool newValue) {
+    mediaStream?.getAudioTracks().forEach((element) {
+      element.enabled = newValue;
+    });
+
+    isAudioActive = newValue;
+  }
 }

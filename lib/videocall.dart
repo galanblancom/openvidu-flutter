@@ -70,10 +70,12 @@ class _VideocallWidgetState extends State<VideocallWidget> {
   }
 
   void _muteMic() {
-    session?.localParticipant?.muteMic();
+    session?.localParticipant?.toggleMicrophone();
     setState(() {
       _isMuted = !_isMuted;
     });
+    session?.websocket
+        .changeStreamAudio(session!.localParticipant!.connectionId!, !_isMuted);
   }
 
   @override
@@ -102,6 +104,9 @@ class _VideocallWidgetState extends State<VideocallWidget> {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text(error)));
       }
+    };
+    webSocket.onRemoteParticipantStreamChangeEvent = () {
+      setState(() {});
     };
     webSocket.connect();
     session?.setWebSocket(webSocket);
@@ -317,17 +322,26 @@ class _VideocallWidgetState extends State<VideocallWidget> {
     );
   }
 
+  getParticipantByRenderer(RTCVideoRenderer renderer) {
+    if (session?.remoteParticipants != null &&
+        session!.remoteParticipants.isNotEmpty &&
+        renderer.srcObject?.id != null) {
+      return session?.remoteParticipants[_renderers.entries
+          .firstWhere((element) => element.key == renderer.srcObject?.id)
+          .value
+          .first];
+    }
+
+    return null;
+  }
+
   getParticipantNameByRenderer(RTCVideoRenderer renderer) {
-    return session
-            ?.remoteParticipants[_renderers.entries
-                .firstWhere((element) => element.key == renderer.srcObject?.id)
-                .value
-                .first]
-            ?.participantName ??
-        '';
+    return getParticipantByRenderer(renderer)?.participantName ?? '';
   }
 
   Widget buildRendererContainer(RTCVideoRenderer renderer) {
+    final participant = getParticipantByRenderer(renderer);
+
     return Expanded(
       child: Container(
         decoration: BoxDecoration(
@@ -335,27 +349,52 @@ class _VideocallWidgetState extends State<VideocallWidget> {
           border: Border.all(color: Colors.grey),
           borderRadius: BorderRadius.circular(8.0),
         ),
-        child: Stack(children: [
-          RTCVideoView(renderer),
-          Positioned(
+        child: Stack(
+          children: [
+            RTCVideoView(renderer),
+            Positioned(
+                child: Container(
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.6),
+                borderRadius:
+                    const BorderRadius.only(bottomRight: Radius.circular(8.0)),
+              ),
+              padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+              child: renderer.srcObject?.id == null || _renderers.isEmpty
+                  ? Text(
+                      "${session?.localParticipant?.participantName}",
+                      style: const TextStyle(color: Colors.white),
+                    )
+                  : Text(
+                      getParticipantNameByRenderer(renderer),
+                      style: const TextStyle(color: Colors.white),
+                    ),
+            )),
+            Positioned(
+              bottom: 0,
               child: Container(
-            decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.6),
-              borderRadius:
-                  const BorderRadius.only(bottomRight: Radius.circular(8.0)),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.6),
+                  borderRadius: const BorderRadius.only(
+                      bottomRight: Radius.circular(8.0)),
+                ),
+                padding:
+                    const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
+                child: Row(
+                  children: [
+                    participant?.isAudioActive ?? false
+                        ? const Icon(Icons.mic, color: Colors.white)
+                        : const Icon(Icons.mic_off, color: Colors.white),
+                    const SizedBox(width: 8),
+                    participant?.isCameraActive ?? false
+                        ? const Icon(Icons.videocam, color: Colors.white)
+                        : const Icon(Icons.videocam_off, color: Colors.white),
+                  ],
+                ),
+              ),
             ),
-            padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-            child: renderer.srcObject?.id == null || _renderers.isEmpty
-                ? Text(
-                    "${session?.localParticipant?.participantName}",
-                    style: const TextStyle(color: Colors.white),
-                  )
-                : Text(
-                    getParticipantNameByRenderer(renderer),
-                    style: const TextStyle(color: Colors.white),
-                  ),
-          ))
-        ]),
+          ],
+        ),
       ),
     );
   }

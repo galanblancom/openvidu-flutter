@@ -12,39 +12,33 @@ class Participant {
   MediaStream? mediaStream;
   MediaStreamTrack? audioTrack;
   MediaStreamTrack? videoTrack;
+  bool isAudioActive = true;
+  bool isCameraActive = true;
 
   Participant(this.participantName, this.session);
 
   Participant.withConnectionId(
       this.connectionId, this.participantName, this.session);
 
-  String? get getConnectionId => connectionId;
+  switchCamera() {
+    if (videoTrack != null) {
+      Helper.switchCamera(videoTrack!);
+    }
+  }
 
-  set setConnectionId(String? connectionId) => this.connectionId = connectionId;
+  toggleCamera() {
+    if (videoTrack != null) {
+      videoTrack!.enabled = !videoTrack!.enabled;
+      isCameraActive = videoTrack!.enabled;
+    }
+  }
 
-  String get getParticipantName => participantName;
-
-  List<RTCIceCandidate> get getIceCandidateList => iceCandidateList;
-
-  RTCPeerConnection? get getPeerConnection => peerConnection;
-
-  set setPeerConnection(RTCPeerConnection? peerConnection) =>
-      this.peerConnection = peerConnection;
-
-  MediaStreamTrack? get getAudioTrack => audioTrack;
-
-  set setAudioTrack(MediaStreamTrack? audioTrack) =>
-      this.audioTrack = audioTrack;
-
-  MediaStreamTrack? get getVideoTrack => videoTrack;
-
-  set setVideoTrack(MediaStreamTrack? videoTrack) =>
-      this.videoTrack = videoTrack;
-
-  MediaStream? get getMediaStream => mediaStream;
-
-  set setMediaStream(MediaStream? mediaStream) =>
-      this.mediaStream = mediaStream;
+  toggleMicrophone() {
+    if (audioTrack != null) {
+      audioTrack!.enabled = !audioTrack!.enabled;
+      isAudioActive = audioTrack!.enabled;
+    }
+  }
 
   Future<void> dispose() async {
     try {

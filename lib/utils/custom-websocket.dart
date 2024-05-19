@@ -10,6 +10,7 @@ import 'package:openviduflutter/utils/pair.dart';
 import 'session.dart'; // Assuming you have a Session class implemented
 
 typedef void OnErrorEvent(String error);
+typedef void OnRemoteParticipantStreamChangeEvent();
 
 class CustomWebSocket {
   final String tag = "CustomWebSocketListener";
@@ -28,6 +29,7 @@ class CustomWebSocket {
   final Set<int> idsOnIceCandidate = <int>{};
   String? mediaServer;
   OnErrorEvent? onErrorEvent;
+  OnRemoteParticipantStreamChangeEvent? onRemoteParticipantStreamChangeEvent;
 
   CustomWebSocket(this.session);
 
@@ -195,6 +197,9 @@ class CustomWebSocket {
       case JsonConstants.participantLeft:
         participantLeftEvent(params);
         break;
+      case JsonConstants.streamPropertyChanged:
+        streamPropertyChangedEvent(params);
+        break;
       default:
         throw Exception("Unknown server event '$method'");
     }
@@ -232,6 +237,39 @@ class CustomWebSocket {
     };
     idPublishVideo =
         sendJson(JsonConstants.publishVideoMethod, publishVideoParams);
+  }
+
+  void streamPropertyChange(
+      {required String streamId,
+      required String property,
+      required dynamic newValue,
+      required String reason}) {
+    final Map<String, dynamic> streamPropertyChangeParams = {
+      'streamId': streamId,
+      'property': property,
+      'newValue': newValue,
+      'reason': reason,
+    };
+    sendJson(
+        JsonConstants.streamPropertyChangedMethod, streamPropertyChangeParams);
+  }
+
+  void changeStreamAudio(String streamId, bool newValue) {
+    streamPropertyChange(
+      streamId: streamId,
+      property: 'audioActive',
+      newValue: newValue,
+      reason: 'publishAudio',
+    );
+  }
+
+  void changeStreamVideo(String streamId, bool newValue) {
+    streamPropertyChange(
+      streamId: streamId,
+      property: 'videoActive',
+      newValue: newValue,
+      reason: 'publishVideo',
+    );
   }
 
   void prepareReceiveVideoFrom(
@@ -319,6 +357,25 @@ class CustomWebSocket {
     remoteParticipant?.dispose();
   }
 
+  void streamPropertyChangedEvent(Map<String, dynamic> params) {
+    final RemoteParticipant? remoteParticipant =
+        session.remoteParticipants[params['connectionId']];
+    if (remoteParticipant != null) {
+      final property = params['property'];
+      final newValue = params['newValue'];
+
+      if (property == 'videoActive') {
+        remoteParticipant.changeCameraStatus(bool.parse(newValue));
+      } else if (property == 'audioActive') {
+        remoteParticipant.changeMicrophoneStatus(bool.parse(newValue));
+      }
+
+      if (onRemoteParticipantStreamChangeEvent != null) {
+        onRemoteParticipantStreamChangeEvent!();
+      }
+    }
+  }
+
   RemoteParticipant newRemoteParticipantAux(
       Map<String, dynamic> participantJson) {
     final connectionId = participantJson[JsonConstants.id];
@@ -386,17 +443,10 @@ class CustomWebSocket {
   }
 
   void onError(String error) {
-    /*if (context.mounted) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(error)));
-      // session.leaveSession(); // Assuming you have a leaveSession method in session
-    }*/
     if (onErrorEvent != null) {
       onErrorEvent!(error);
     }
-
-    session
-        .leaveSession(); // Assuming you have a leaveSession method in session
+    session.leaveSession();
   }
 
   void pingMessageHandler() {
@@ -408,7 +458,7 @@ class CustomWebSocket {
     });
   }
 
-  int sendJson(String method, [Map<String, String>? params]) {
+  int sendJson(String method, [Map<String, dynamic>? params]) {
     final id = rpcId;
     rpcId++;
 
@@ -420,7 +470,7 @@ class CustomWebSocket {
     };
 
     final jsonString = jsonEncode(jsonObject);
-    webSocket!.add(jsonString);
+    webSocket?.add(jsonString);
     return id;
   }
 

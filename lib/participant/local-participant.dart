@@ -50,16 +50,4 @@ class LocalParticipant extends Participant {
     });
     return mediaStream!;
   }
-
-  switchCamera() {
-    if (videoTrack != null) {
-      Helper.switchCamera(videoTrack!);
-    }
-  }
-
-  muteMic() {
-    if (audioTrack != null) {
-      audioTrack!.enabled = !audioTrack!.enabled;
-    }
-  }
 }
