@@ -201,7 +201,12 @@ class CustomWebSocket {
         streamPropertyChangedEvent(params);
         break;
       default:
-        throw Exception("Unknown server event '$method'");
+        print(
+            " *************************************************************** ");
+        print(
+            " *************** Unknown server event '$method'  *************** ");
+        print(
+            " *************************************************************** ");
     }
   }
 

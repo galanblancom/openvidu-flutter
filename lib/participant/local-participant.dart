@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:openviduflutter/utils/session.dart';
 import 'participant.dart';
@@ -6,26 +5,31 @@ import 'participant.dart';
 class LocalParticipant extends Participant {
   List<RTCIceCandidate> localIceCandidates = [];
   RTCSessionDescription? localSessionDescription;
+  bool isFrontCameraActive = true;
 
   LocalParticipant(String participantName, Session session)
       : super(participantName, session) {
     session.localParticipant = this;
   }
 
-  void storeIceCandidate(RTCIceCandidate iceCandidate) {
-    localIceCandidates.add(iceCandidate);
+  Future<void> switchCamera() async {
+    if (videoTrack != null) {
+      isFrontCameraActive = await Helper.switchCamera(videoTrack!);
+    }
   }
 
-  List<RTCIceCandidate> getLocalIceCandidates() {
-    return localIceCandidates;
+  toggleVideo() {
+    if (videoTrack != null) {
+      videoTrack!.enabled = !videoTrack!.enabled;
+      isVideoActive = videoTrack!.enabled;
+    }
   }
 
-  void storeLocalSessionDescription(RTCSessionDescription sessionDescription) {
-    localSessionDescription = sessionDescription;
-  }
-
-  RTCSessionDescription? getLocalSessionDescription() {
-    return localSessionDescription;
+  toggleAudio() {
+    if (audioTrack != null) {
+      audioTrack!.enabled = !audioTrack!.enabled;
+      isAudioActive = audioTrack!.enabled;
+    }
   }
 
   Future<void> startLocalCamera() async {
@@ -50,5 +54,31 @@ class LocalParticipant extends Participant {
     });
 
     renderer.srcObject = mediaStream;
+  }
+
+  Future<bool> getIsFrontCamera() async {
+    // Enumerate all available media devices
+    List<MediaDeviceInfo> devices =
+        await navigator.mediaDevices.enumerateDevices();
+
+    // Filter the devices to find video input devices
+    List<MediaDeviceInfo> videoDevices =
+        devices.where((device) => device.kind == 'videoinput').toList();
+
+    // Match the track with the devices
+    for (var device in videoDevices) {
+      if (device.deviceId == videoTrack?.getSettings()["deviceId"]) {
+        // Check if the device label contains "front" or "back"
+        if (device.label.toLowerCase().contains('front')) {
+          return true;
+        } else if (device.label.toLowerCase().contains('back')) {
+          return false;
+        }
+      }
+    }
+
+    // If the label does not explicitly mention "front" or "back", you may need additional logic
+    // or assume a default (e.g., false for back camera)
+    return false; // Default assumption
   }
 }

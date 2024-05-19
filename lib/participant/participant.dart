@@ -21,28 +21,11 @@ class Participant {
   Participant.withConnectionId(
       this.connectionId, this.participantName, this.session);
 
-  switchCamera() {
-    if (videoTrack != null) {
-      Helper.switchCamera(videoTrack!);
-    }
-  }
-
-  toggleVideo() {
-    if (videoTrack != null) {
-      videoTrack!.enabled = !videoTrack!.enabled;
-      isVideoActive = videoTrack!.enabled;
-    }
-  }
-
-  toggleAudio() {
-    if (audioTrack != null) {
-      audioTrack!.enabled = !audioTrack!.enabled;
-      isAudioActive = audioTrack!.enabled;
-    }
-  }
-
   Future<void> dispose() async {
     try {
+      await audioTrack?.stop();
+      await videoTrack?.stop();
+      await mediaStream?.dispose();
       await renderer.dispose();
       await peerConnection?.close();
     } catch (e) {

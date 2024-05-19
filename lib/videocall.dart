@@ -8,7 +8,6 @@ import 'package:openviduflutter/api/api-service.dart';
 import 'package:openviduflutter/main.dart';
 import 'package:openviduflutter/participant/local-participant.dart';
 import 'package:openviduflutter/participant/participant.dart';
-import 'package:openviduflutter/participant/remote-participant.dart';
 import 'package:openviduflutter/utils/custom-websocket.dart';
 import 'package:openviduflutter/utils/session.dart';
 
@@ -61,17 +60,19 @@ class _VideocallWidgetState extends State<VideocallWidget> {
   }
 
   void _switchCamera() {
-    session?.localParticipant?.switchCamera();
+    session?.localParticipant?.switchCamera().then((value) {
+      refresh();
+    });
   }
 
   void _toggleVideo() {
     session?.localToggleVideo();
-    setState(() {});
+    refresh();
   }
 
   void _toggleMic() {
     session?.localToggleAudio();
-    setState(() {});
+    refresh();
   }
 
   @override
@@ -90,6 +91,12 @@ class _VideocallWidgetState extends State<VideocallWidget> {
     super.dispose();
   }
 
+  refresh() {
+    if (context.mounted) {
+      setState(() {});
+    }
+  }
+
   startWebSocket() {
     CustomWebSocket webSocket = CustomWebSocket(session!);
     webSocket.onErrorEvent = (error) {
@@ -99,7 +106,7 @@ class _VideocallWidgetState extends State<VideocallWidget> {
       }
     };
     webSocket.onRemoteParticipantStreamChangeEvent = () {
-      setState(() {});
+      refresh();
     };
     webSocket.connect();
     session?.setWebSocket(webSocket);
@@ -110,15 +117,15 @@ class _VideocallWidgetState extends State<VideocallWidget> {
       apiService.createToken().then((token) {
         session = Session(sessionId, token);
         session!.onNotifySetRemoteMediaStream = (String connectionId) {
-          setState(() {});
+          refresh();
         } as OnNotifySetRemoteMediaStreamEvent?;
         session!.onRemoveRemoteParticipant = (String connectionId) {
-          setState(() {});
+          refresh();
         } as OnRemoveRemoteParticipantEvent?;
 
         var localParticipant = LocalParticipant(widget.userName, session!);
         localParticipant.renderer.initialize().then((value) {
-          localParticipant.startLocalCamera().then((stream) => setState(() {}));
+          localParticipant.startLocalCamera().then((stream) => refresh());
         });
 
         startWebSocket();
@@ -234,24 +241,26 @@ class _VideocallWidgetState extends State<VideocallWidget> {
                 ),
                 child: buildLocalRenderer(),
                 onDragEnd: (details) {
-                  setState(() {
-                    if (details.offset.dx < 0) {
-                      _xPosition = 0;
-                    } else if (details.offset.dx >
-                        MediaQuery.of(context).size.width - 100) {
-                      _xPosition = MediaQuery.of(context).size.width - 100;
-                    } else {
-                      _xPosition = details.offset.dx;
-                    }
-                    if (details.offset.dy < 0) {
-                      _yPosition = 0;
-                    } else if (details.offset.dy >
-                        MediaQuery.of(context).size.height - 150) {
-                      _yPosition = MediaQuery.of(context).size.height - 225;
-                    } else {
-                      _yPosition = details.offset.dy - 75;
-                    }
-                  });
+                  if (context.mounted) {
+                    setState(() {
+                      if (details.offset.dx < 0) {
+                        _xPosition = 0;
+                      } else if (details.offset.dx >
+                          MediaQuery.of(context).size.width - 100) {
+                        _xPosition = MediaQuery.of(context).size.width - 100;
+                      } else {
+                        _xPosition = details.offset.dx;
+                      }
+                      if (details.offset.dy < 0) {
+                        _yPosition = 0;
+                      } else if (details.offset.dy >
+                          MediaQuery.of(context).size.height - 150) {
+                        _yPosition = MediaQuery.of(context).size.height - 225;
+                      } else {
+                        _yPosition = details.offset.dy - 75;
+                      }
+                    });
+                  }
                 },
               ),
             ),
@@ -290,7 +299,9 @@ class _VideocallWidgetState extends State<VideocallWidget> {
               children: [
                 session!.localParticipant!.isVideoActive
                     ? RTCVideoView(session!.localParticipant!.renderer,
-                        mirror: true)
+                        mirror:
+                            session?.localParticipant?.isFrontCameraActive ??
+                                false)
                     : _noVideoInitial(
                         session!.localParticipant!.participantName, fullScreen),
                 Positioned(
@@ -426,11 +437,6 @@ class _VideocallWidgetState extends State<VideocallWidget> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: <Widget>[
           _noHeroFloatingActionButton(
-            onPressed: _switchCamera,
-            tooltip: 'Switch Camera',
-            icon: const Icon(Icons.switch_camera),
-          ),
-          _noHeroFloatingActionButton(
             onPressed: _toggleVideo,
             tooltip: session?.localParticipant?.isVideoActive ?? true
                 ? 'Turn on video'
@@ -439,6 +445,12 @@ class _VideocallWidgetState extends State<VideocallWidget> {
                 ? Icons.videocam
                 : Icons.videocam_off),
           ),
+          if (session?.localParticipant?.isVideoActive ?? true)
+            _noHeroFloatingActionButton(
+              onPressed: _switchCamera,
+              tooltip: 'Switch Camera',
+              icon: const Icon(Icons.switch_camera),
+            ),
           _noHeroFloatingActionButton(
             onPressed: _hangUp,
             tooltip: 'Hang Up',
