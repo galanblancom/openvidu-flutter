@@ -55,7 +55,7 @@ class _VideocallWidgetState extends State<VideocallWidget> {
   void _hangUp() {
     if (session != null) {
       Navigator.of(context)
-          .pushReplacement(MaterialPageRoute(builder: (context) => MyHome()));
+          .pushReplacement(MaterialPageRoute(builder: (context) => const MyHome()));
     }
   }
 

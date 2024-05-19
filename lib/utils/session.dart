@@ -1,11 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:openviduflutter/participant/local-participant.dart';
 import 'package:openviduflutter/participant/remote-participant.dart';
 import 'package:openviduflutter/utils/custom-websocket.dart';
 
-typedef void OnNotifySetRemoteMediaStreamEvent(String id);
-typedef void OnRemoveRemoteParticipantEvent(String id);
+typedef OnNotifySetRemoteMediaStreamEvent = void Function(String id);
+typedef OnRemoveRemoteParticipantEvent = void Function(String id);
 
 class Session {
   LocalParticipant? localParticipant;

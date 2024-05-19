@@ -2,15 +2,14 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:openviduflutter/constants/json-constants.dart';
 import 'package:openviduflutter/participant/remote-participant.dart';
 import 'package:openviduflutter/utils/pair.dart';
 import 'session.dart'; // Assuming you have a Session class implemented
 
-typedef void OnErrorEvent(String error);
-typedef void OnRemoteParticipantStreamChangeEvent();
+typedef OnErrorEvent = void Function(String error);
+typedef OnRemoteParticipantStreamChangeEvent = void Function();
 
 class CustomWebSocket {
   final String tag = "CustomWebSocketListener";

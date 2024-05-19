@@ -6,17 +6,18 @@ import 'dart:io';
 import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:url_launcher/url_launcher.dart';
 
-void main() => runApp(MaterialApp(
+void main() => runApp(const MaterialApp(
       home: MyHome(),
       debugShowCheckedModeBanner: false,
       debugShowMaterialGrid: false,
     ));
 
 class MyHome extends StatefulWidget {
+  const MyHome({super.key});
+
   @override
-  _MyHomeState createState() => new _MyHomeState();
+  _MyHomeState createState() => _MyHomeState();
 }
 
 class _MyHomeState extends State<MyHome> {

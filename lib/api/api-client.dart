@@ -17,24 +17,24 @@ class ApiClient {
   Future<dynamic> request(Config config, {bool autoLogin = false}) async {
     print('[${config.method}] Sending request: ${config.uri.toString()}');
 
-    final HttpClientRequest _request = await client
+    final HttpClientRequest clientRequest = await client
         .openUrl(config.method, config.uri)
         .then((HttpClientRequest request) => _addHeaders(request, config))
         .then((HttpClientRequest request) => _addCookies(request, config))
         .then((HttpClientRequest request) => _addBody(request, config));
 
-    final HttpClientResponse _response = await _request.close();
+    final HttpClientResponse response = await clientRequest.close();
 
     print(
-        '[${config.method}] Received: ${_response.reasonPhrase} [${_response.statusCode}] - ${config.uri.toString()}');
+        '[${config.method}] Received: ${response.reasonPhrase} [${response.statusCode}] - ${config.uri.toString()}');
 
-    if (_response.statusCode == HttpStatus.ok) {
+    if (response.statusCode == HttpStatus.ok) {
       return config.hasResponse
-          ? Future.value(config.responseType?.parse(_response))
-          : Future<HttpClientResponse>.value(_response);
+          ? Future.value(config.responseType?.parse(response))
+          : Future<HttpClientResponse>.value(response);
     }
 
-    return await _processError(_response, config,
+    return await _processError(response, config,
         onAutoLoginSuccess: () => request(config));
   }
 
