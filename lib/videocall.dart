@@ -1,10 +1,15 @@
+import 'dart:convert';
+import 'dart:math';
+import 'package:crypto/crypto.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:openviduflutter/api/api-service.dart';
 import 'package:openviduflutter/main.dart';
 import 'package:openviduflutter/participant/local-participant.dart';
+import 'package:openviduflutter/participant/participant.dart';
+import 'package:openviduflutter/participant/remote-participant.dart';
 import 'package:openviduflutter/utils/custom-websocket.dart';
-import 'package:openviduflutter/utils/pair.dart';
 import 'package:openviduflutter/utils/session.dart';
 
 class VideocallWidget extends StatefulWidget {
@@ -28,10 +33,6 @@ class VideocallWidget extends StatefulWidget {
 }
 
 class _VideocallWidgetState extends State<VideocallWidget> {
-  final _localRenderer = RTCVideoRenderer();
-  final Map<String, Pair<String, RTCVideoRenderer>> _renderers = {};
-
-  bool _isMuted = false;
   late ApiService apiService;
   Session? session;
 
@@ -42,7 +43,7 @@ class _VideocallWidgetState extends State<VideocallWidget> {
   void initState() {
     super.initState();
     apiService = ApiService(widget.sessionId, widget.server, widget.secret);
-    initRenderers();
+    _connect();
 
     Future.delayed(Duration.zero, () {
       setState(() {
@@ -50,12 +51,6 @@ class _VideocallWidgetState extends State<VideocallWidget> {
         _yPosition = MediaQuery.of(context).size.height - 300;
       });
     });
-  }
-
-  Future<void> initRenderers() async {
-    await _localRenderer.initialize();
-    //await _remoteRenderer.initialize();
-    _connect();
   }
 
   void _hangUp() {
@@ -69,13 +64,14 @@ class _VideocallWidgetState extends State<VideocallWidget> {
     session?.localParticipant?.switchCamera();
   }
 
-  void _muteMic() {
-    session?.localParticipant?.toggleMicrophone();
-    setState(() {
-      _isMuted = !_isMuted;
-    });
-    session?.websocket
-        .changeStreamAudio(session!.localParticipant!.connectionId!, !_isMuted);
+  void _toggleVideo() {
+    session?.localToggleVideo();
+    setState(() {});
+  }
+
+  void _toggleMic() {
+    session?.localToggleAudio();
+    setState(() {});
   }
 
   @override
@@ -90,9 +86,6 @@ class _VideocallWidgetState extends State<VideocallWidget> {
 
   @override
   void dispose() {
-    for (var renderer in _renderers.values) {
-      renderer.second.dispose();
-    }
     session?.leaveSession();
     super.dispose();
   }
@@ -116,30 +109,17 @@ class _VideocallWidgetState extends State<VideocallWidget> {
     apiService.createSession().then((sessionId) {
       apiService.createToken().then((token) {
         session = Session(sessionId, token);
-        session!.onSetRemoteMediaStream =
-            (String connectionId, MediaStream mediaStream) {
-          setState(() {
-            var remoteRenderer = RTCVideoRenderer();
-            remoteRenderer.initialize().then((value) {
-              remoteRenderer.srcObject = mediaStream;
-              _renderers[mediaStream.id] = Pair(connectionId, remoteRenderer);
-            });
-          });
-        } as OnSetRemoteMediaStreamEvent?;
+        session!.onNotifySetRemoteMediaStream = (String connectionId) {
+          setState(() {});
+        } as OnNotifySetRemoteMediaStreamEvent?;
         session!.onRemoveRemoteParticipant = (String connectionId) {
-          setState(() {
-            var id = _renderers.entries
-                .firstWhere((element) => element.value.first == connectionId)
-                .key;
-            _renderers[id]!.second.dispose();
-            _renderers.remove(id);
-          });
+          setState(() {});
         } as OnRemoveRemoteParticipantEvent?;
 
         var localParticipant = LocalParticipant(widget.userName, session!);
-        localParticipant.startLocalCamera().then((stream) => setState(() {
-              _localRenderer.srcObject = localParticipant.mediaStream;
-            }));
+        localParticipant.renderer.initialize().then((value) {
+          localParticipant.startLocalCamera().then((stream) => setState(() {}));
+        });
 
         startWebSocket();
       });
@@ -147,71 +127,65 @@ class _VideocallWidgetState extends State<VideocallWidget> {
   }
 
   _body() {
+    var remoteParticipants = session?.remoteParticipants.entries ?? [];
+
     return Stack(children: [
       Column(
         children: <Widget>[
           Expanded(
-            child: _renderers.isEmpty
-                ? Column(children: [buildRendererContainer(_localRenderer)])
-                : _renderers.length == 1
+            child: remoteParticipants.isEmpty
+                ? Column(children: [buildLocalRenderer(fullScreen: true)])
+                : remoteParticipants.length == 1
                     ? Column(children: [
-                        buildRendererContainer(
-                            _renderers[_renderers.keys.elementAt(0)]!.second),
+                        buildRendererContainer(remoteParticipants.elementAt(0)),
                       ])
-                    : _renderers.length == 2
+                    : remoteParticipants.length == 2
                         ? Column(
-                            children: _renderers.values.map((renderer) {
-                              return buildRendererContainer(renderer.second);
+                            children: remoteParticipants.map((participantPair) {
+                              return buildRendererContainer(participantPair);
                             }).toList(),
                           )
-                        : _renderers.length == 3
+                        : remoteParticipants.length == 3
                             ? Column(
                                 children: [
                                   buildRendererContainer(
-                                      _renderers[_renderers.keys.elementAt(0)]!
-                                          .second),
+                                      remoteParticipants.elementAt(0)),
                                   Expanded(
                                     child: Row(
                                       children: [
-                                        buildRendererContainer(_renderers[
-                                                _renderers.keys.elementAt(1)]!
-                                            .second),
-                                        buildRendererContainer(_renderers[
-                                                _renderers.keys.elementAt(2)]!
-                                            .second),
+                                        buildRendererContainer(
+                                            remoteParticipants.elementAt(1)),
+                                        buildRendererContainer(
+                                            remoteParticipants.elementAt(2)),
                                       ],
                                     ),
                                   ),
                                 ],
                               )
-                            : _renderers.length == 4
+                            : remoteParticipants.length == 4
                                 ? Column(
                                     children: [
                                       Expanded(
                                         child: Row(
                                           children: [
-                                            buildRendererContainer(_renderers[
-                                                    _renderers.keys
-                                                        .elementAt(0)]!
-                                                .second),
-                                            buildRendererContainer(_renderers[
-                                                    _renderers.keys
-                                                        .elementAt(1)]!
-                                                .second),
+                                            buildRendererContainer(
+                                                remoteParticipants
+                                                    .elementAt(0)),
+                                            buildRendererContainer(
+                                                remoteParticipants
+                                                    .elementAt(1)),
                                           ],
                                         ),
                                       ),
                                       Expanded(
                                         child: Row(
                                           children: [
-                                            buildRendererContainer(_renderers[
-                                                    _renderers.keys
-                                                        .elementAt(2)]!
-                                                .second),
-                                            buildRendererContainer(_renderers[
-                                                    _renderers.keys
-                                                        .elementAt(3)]!
-                                                .second),
+                                            buildRendererContainer(
+                                                remoteParticipants
+                                                    .elementAt(2)),
+                                            buildRendererContainer(
+                                                remoteParticipants
+                                                    .elementAt(3)),
                                           ],
                                         ),
                                       ),
@@ -227,14 +201,13 @@ class _VideocallWidgetState extends State<VideocallWidget> {
                                       mainAxisSpacing: 1.0,
                                       childAspectRatio: 1.0,
                                     ),
-                                    itemCount: _renderers.length,
+                                    itemCount: remoteParticipants.length,
                                     itemBuilder: (context, index) {
                                       return Column(
                                         children: [
-                                          buildRendererContainer(_renderers[
-                                                  _renderers.keys
-                                                      .elementAt(index)]!
-                                              .second),
+                                          buildRendererContainer(
+                                              remoteParticipants
+                                                  .elementAt(index)),
                                         ],
                                       );
                                     },
@@ -243,7 +216,7 @@ class _VideocallWidgetState extends State<VideocallWidget> {
           _buttons(),
         ],
       ),
-      _renderers.keys.isEmpty
+      (session?.remoteParticipants.entries ?? []).isEmpty
           ? const SizedBox.shrink()
           : Positioned(
               left: _xPosition,
@@ -285,10 +258,26 @@ class _VideocallWidgetState extends State<VideocallWidget> {
     ]);
   }
 
-  Widget buildLocalRenderer() {
+  Widget buildLocalRenderer({bool fullScreen = false}) {
+    if (session?.localParticipant?.renderer == null) {
+      if (fullScreen) {
+        return const Expanded(
+            child: Center(child: CircularProgressIndicator()));
+      }
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (fullScreen) {
+      return Expanded(child: buildLocalRendererBody(fullScreen: fullScreen));
+    }
+
+    return buildLocalRendererBody(fullScreen: fullScreen);
+  }
+
+  buildLocalRendererBody({bool fullScreen = false}) {
     return Container(
-      width: 100.0,
-      height: 150.0,
+      width: fullScreen ? null : 100.0,
+      height: fullScreen ? null : 150.0,
       decoration: BoxDecoration(
         color: Colors.black,
         border: Border.all(color: Colors.grey),
@@ -299,7 +288,11 @@ class _VideocallWidgetState extends State<VideocallWidget> {
           Expanded(
             child: Stack(
               children: [
-                RTCVideoView(_localRenderer, mirror: true),
+                session!.localParticipant!.isVideoActive
+                    ? RTCVideoView(session!.localParticipant!.renderer,
+                        mirror: true)
+                    : _noVideoInitial(
+                        session!.localParticipant!.participantName, fullScreen),
                 Positioned(
                     child: Container(
                   decoration: BoxDecoration(
@@ -307,12 +300,14 @@ class _VideocallWidgetState extends State<VideocallWidget> {
                     borderRadius: const BorderRadius.only(
                         bottomRight: Radius.circular(8.0)),
                   ),
-                  padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                  padding: const EdgeInsets.only(
+                      left: 8.0, right: 8.0, bottom: 4.0, top: 2.0),
                   child: session?.localParticipant?.participantName == null
                       ? const SizedBox.shrink()
                       : Text(session!.localParticipant!.participantName,
-                          style: const TextStyle(
-                              color: Colors.white, fontSize: 8)),
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: fullScreen ? null : 8)),
                 ))
               ],
             ),
@@ -322,26 +317,29 @@ class _VideocallWidgetState extends State<VideocallWidget> {
     );
   }
 
-  getParticipantByRenderer(RTCVideoRenderer renderer) {
-    if (session?.remoteParticipants != null &&
-        session!.remoteParticipants.isNotEmpty &&
-        renderer.srcObject?.id != null) {
-      return session?.remoteParticipants[_renderers.entries
-          .firstWhere((element) => element.key == renderer.srcObject?.id)
-          .value
-          .first];
-    }
-
-    return null;
+  Color getRandomLightColor() {
+    final Random random = Random();
+    // Generate random RGB values between 128 and 255 to ensure light colors
+    int red = 128 + random.nextInt(128); // 128-255
+    int green = 128 + random.nextInt(128); // 128-255
+    int blue = 128 + random.nextInt(128); // 128-255
+    return Color.fromARGB(255, red, green, blue);
   }
 
-  getParticipantNameByRenderer(RTCVideoRenderer renderer) {
-    return getParticipantByRenderer(renderer)?.participantName ?? '';
+  Color getColorFromString(String input) {
+    // Hash the input string using SHA-256
+    var bytes = utf8.encode(input);
+    var digest = sha256.convert(bytes);
+
+    // Use the first 3 bytes of the hash to generate RGB values
+    int red = (digest.bytes[0] % 128) + 128; // 128-255
+    int green = (digest.bytes[1] % 128) + 128; // 128-255
+    int blue = (digest.bytes[2] % 128) + 128; // 128-255
+
+    return Color.fromARGB(255, red, green, blue);
   }
 
-  Widget buildRendererContainer(RTCVideoRenderer renderer) {
-    final participant = getParticipantByRenderer(renderer);
-
+  Widget buildRendererContainer(MapEntry<String, Participant> remotePair) {
     return Expanded(
       child: Container(
         decoration: BoxDecoration(
@@ -351,7 +349,9 @@ class _VideocallWidgetState extends State<VideocallWidget> {
         ),
         child: Stack(
           children: [
-            RTCVideoView(renderer),
+            remotePair.value.isVideoActive
+                ? RTCVideoView(remotePair.value.renderer)
+                : _noVideoInitial(remotePair.value.participantName),
             Positioned(
                 child: Container(
               decoration: BoxDecoration(
@@ -360,15 +360,10 @@ class _VideocallWidgetState extends State<VideocallWidget> {
                     const BorderRadius.only(bottomRight: Radius.circular(8.0)),
               ),
               padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-              child: renderer.srcObject?.id == null || _renderers.isEmpty
-                  ? Text(
-                      "${session?.localParticipant?.participantName}",
-                      style: const TextStyle(color: Colors.white),
-                    )
-                  : Text(
-                      getParticipantNameByRenderer(renderer),
-                      style: const TextStyle(color: Colors.white),
-                    ),
+              child: Text(
+                remotePair.value.participantName,
+                style: const TextStyle(color: Colors.white),
+              ),
             )),
             Positioned(
               bottom: 0,
@@ -382,11 +377,11 @@ class _VideocallWidgetState extends State<VideocallWidget> {
                     const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
                 child: Row(
                   children: [
-                    participant?.isAudioActive ?? false
+                    remotePair.value.isAudioActive
                         ? const Icon(Icons.mic, color: Colors.white)
                         : const Icon(Icons.mic_off, color: Colors.white),
                     const SizedBox(width: 8),
-                    participant?.isCameraActive ?? false
+                    remotePair.value.isVideoActive
                         ? const Icon(Icons.videocam, color: Colors.white)
                         : const Icon(Icons.videocam_off, color: Colors.white),
                   ],
@@ -399,6 +394,31 @@ class _VideocallWidgetState extends State<VideocallWidget> {
     );
   }
 
+  _noVideoInitial(String participantName, [bool fullScreen = true]) {
+    var randomColor = getColorFromString(participantName);
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Center(
+          child: Container(
+            width: fullScreen ? 150.0 : 50.0,
+            height: fullScreen ? 150.0 : 50.0,
+            decoration: BoxDecoration(
+              color: randomColor.withOpacity(0.5),
+              border: Border.all(color: randomColor, width: 3.0),
+              borderRadius: const BorderRadius.all(Radius.circular(8.0)),
+            ),
+            child: Center(
+              child: Text(participantName[0].toUpperCase(),
+                  style: TextStyle(
+                      fontSize: fullScreen ? 80 : 20, color: Colors.black)),
+            ),
+          ),
+        )
+      ],
+    );
+  }
+
   _buttons() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -408,18 +428,34 @@ class _VideocallWidgetState extends State<VideocallWidget> {
           _noHeroFloatingActionButton(
             onPressed: _switchCamera,
             tooltip: 'Switch Camera',
-            icon: Icons.switch_camera,
+            icon: const Icon(Icons.switch_camera),
+          ),
+          _noHeroFloatingActionButton(
+            onPressed: _toggleVideo,
+            tooltip: session?.localParticipant?.isVideoActive ?? true
+                ? 'Turn on video'
+                : 'Turn off video',
+            icon: Icon(session?.localParticipant?.isVideoActive ?? true
+                ? Icons.videocam
+                : Icons.videocam_off),
           ),
           _noHeroFloatingActionButton(
             onPressed: _hangUp,
             tooltip: 'Hang Up',
             backgroundColor: Colors.red,
-            icon: Icons.call_end,
+            icon: const Icon(
+              Icons.call_end,
+              color: Colors.white,
+            ),
           ),
           _noHeroFloatingActionButton(
-            onPressed: _muteMic,
-            tooltip: _isMuted ? 'Unmute Mic' : 'Mute Mic',
-            icon: _isMuted ? Icons.mic_off : Icons.mic,
+            onPressed: _toggleMic,
+            tooltip: session?.localParticipant?.isAudioActive ?? true
+                ? 'Mute Mic'
+                : 'Unmute Mic',
+            icon: Icon(session?.localParticipant?.isAudioActive ?? true
+                ? Icons.mic
+                : Icons.mic_off),
           ),
         ],
       ),
@@ -429,7 +465,7 @@ class _VideocallWidgetState extends State<VideocallWidget> {
   Widget _noHeroFloatingActionButton({
     required VoidCallback onPressed,
     required String tooltip,
-    required IconData icon,
+    required Icon icon,
     Color? backgroundColor,
   }) {
     return FloatingActionButton(
@@ -437,7 +473,7 @@ class _VideocallWidgetState extends State<VideocallWidget> {
       onPressed: onPressed,
       tooltip: tooltip,
       backgroundColor: backgroundColor,
-      child: Icon(icon),
+      child: icon,
     );
   }
 }

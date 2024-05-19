@@ -4,7 +4,7 @@ import 'package:openviduflutter/participant/local-participant.dart';
 import 'package:openviduflutter/participant/remote-participant.dart';
 import 'package:openviduflutter/utils/custom-websocket.dart';
 
-typedef void OnSetRemoteMediaStreamEvent(String id, MediaStream remoteStream);
+typedef void OnNotifySetRemoteMediaStreamEvent(String id);
 typedef void OnRemoveRemoteParticipantEvent(String id);
 
 class Session {
@@ -12,7 +12,7 @@ class Session {
   Map<String, RemoteParticipant> remoteParticipants = {};
   String id;
   String token;
-  OnSetRemoteMediaStreamEvent? onSetRemoteMediaStream;
+  OnNotifySetRemoteMediaStreamEvent? onNotifySetRemoteMediaStream;
   OnRemoveRemoteParticipantEvent? onRemoveRemoteParticipant;
 
   final List<Map<String, List<String>>> iceServersDefault = [
@@ -143,26 +143,44 @@ class Session {
     remoteParticipants[remoteParticipant.connectionId!] = remoteParticipant;
   }
 
-  RemoteParticipant? removeRemoteParticipant(String id) {
+  Future<void> removeRemoteParticipant(String id) async {
+    await remoteParticipants[id]?.renderer.dispose();
+    await remoteParticipants.remove(id)?.dispose();
     onRemoveRemoteParticipant!(id);
-    return remoteParticipants.remove(id);
   }
 
   void leaveSession() async {
     websocket.leaveRoom();
     await websocket.disconnect();
-    localParticipant!.dispose();
 
+    localParticipant!.dispose();
     for (var remoteParticipant in remoteParticipants.values) {
-      remoteParticipant.peerConnection?.close();
+      remoteParticipant.dispose();
     }
   }
 
   void _setRemoteMediaStream(
       MediaStream stream, RemoteParticipant participant) {
     participant.mediaStream = stream;
-    participant.isAudioActive = stream.getAudioTracks().first.enabled;
-    participant.isCameraActive = stream.getVideoTracks().first.enabled;
-    onSetRemoteMediaStream!(participant.connectionId!, stream);
+    //participant.isAudioActive = stream.getAudioTracks().first.enabled;
+    //participant.isCameraActive = stream.getVideoTracks().first.enabled;
+    participant.renderer.initialize().then((value) {
+      participant.renderer.srcObject = stream;
+      if (onNotifySetRemoteMediaStream != null) {
+        onNotifySetRemoteMediaStream!(participant.connectionId!);
+      }
+    });
+  }
+
+  void localToggleAudio() {
+    localParticipant!.toggleAudio();
+    websocket.changeStreamAudio(
+        localParticipant!.connectionId!, localParticipant!.isAudioActive);
+  }
+
+  void localToggleVideo() {
+    localParticipant!.toggleVideo();
+    websocket.changeStreamVideo(
+        localParticipant!.connectionId!, localParticipant!.isVideoActive);
   }
 }

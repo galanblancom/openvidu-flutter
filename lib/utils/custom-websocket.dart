@@ -140,8 +140,8 @@ class CustomWebSocket {
         result['sdpOffer'],
         'offer',
       );
-      remoteParticipant!.peerConnection!
-          .setRemoteDescription(remoteSdpOffer)
+      remoteParticipant?.peerConnection
+          ?.setRemoteDescription(remoteSdpOffer)
           .then((_) {
         subscriptionInitiatedFromServer(remoteParticipant, streamId);
       });
@@ -348,13 +348,13 @@ class CustomWebSocket {
     final remoteParticipantId = params[JsonConstants.id];
     final remoteParticipant = session.remoteParticipants[remoteParticipantId]!;
     final streamId = params['streams'][0]['id'];
+    remoteParticipant.isAudioActive = params['streams'][0]['audioActive'];
+    remoteParticipant.isVideoActive = params['streams'][0]['videoActive'];
     subscribe(remoteParticipant, streamId);
   }
 
   void participantLeftEvent(Map<String, dynamic> params) {
-    final remoteParticipant =
-        session.removeRemoteParticipant(params['connectionId']);
-    remoteParticipant?.dispose();
+    session.removeRemoteParticipant(params['connectionId']);
   }
 
   void streamPropertyChangedEvent(Map<String, dynamic> params) {
@@ -485,6 +485,8 @@ class CustomWebSocket {
         List<dynamic> streams = participantJson['streams'];
         for (var stream in streams) {
           String streamId = stream['id'];
+          remoteParticipant.isAudioActive = stream['audioActive'];
+          remoteParticipant.isVideoActive = stream['videoActive'];
           subscribe(remoteParticipant, streamId);
         }
       } catch (e) {

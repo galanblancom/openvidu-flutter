@@ -28,7 +28,7 @@ class LocalParticipant extends Participant {
     return localSessionDescription;
   }
 
-  Future<MediaStream> startLocalCamera() async {
+  Future<void> startLocalCamera() async {
     final Map<String, dynamic> mediaConstraints = {
       'audio': true,
       'video': {
@@ -48,6 +48,7 @@ class LocalParticipant extends Participant {
     mediaStream!.getVideoTracks().forEach((track) {
       videoTrack = track;
     });
-    return mediaStream!;
+
+    renderer.srcObject = mediaStream;
   }
 }

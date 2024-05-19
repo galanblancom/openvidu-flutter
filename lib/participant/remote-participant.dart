@@ -13,7 +13,7 @@ class RemoteParticipant extends Participant {
       element.enabled = newValue;
     });
 
-    isCameraActive = newValue;
+    isVideoActive = newValue;
   }
 
   changeMicrophoneStatus(bool newValue) {

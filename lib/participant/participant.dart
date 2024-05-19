@@ -9,11 +9,12 @@ class Participant {
   Session session;
   List<RTCIceCandidate> iceCandidateList = [];
   RTCPeerConnection? peerConnection;
+  RTCVideoRenderer renderer = RTCVideoRenderer();
   MediaStream? mediaStream;
   MediaStreamTrack? audioTrack;
   MediaStreamTrack? videoTrack;
   bool isAudioActive = true;
-  bool isCameraActive = true;
+  bool isVideoActive = true;
 
   Participant(this.participantName, this.session);
 
@@ -26,14 +27,14 @@ class Participant {
     }
   }
 
-  toggleCamera() {
+  toggleVideo() {
     if (videoTrack != null) {
       videoTrack!.enabled = !videoTrack!.enabled;
-      isCameraActive = videoTrack!.enabled;
+      isVideoActive = videoTrack!.enabled;
     }
   }
 
-  toggleMicrophone() {
+  toggleAudio() {
     if (audioTrack != null) {
       audioTrack!.enabled = !audioTrack!.enabled;
       isAudioActive = audioTrack!.enabled;
@@ -42,6 +43,7 @@ class Participant {
 
   Future<void> dispose() async {
     try {
+      await renderer.dispose();
       await peerConnection?.close();
     } catch (e) {
       print('Dispose PeerConnection: $e');
