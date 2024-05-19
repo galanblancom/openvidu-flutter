@@ -1,4 +1,5 @@
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:logging/logging.dart';
 import 'package:openviduflutter/participant/local-participant.dart';
 import 'package:openviduflutter/participant/remote-participant.dart';
 import 'package:openviduflutter/utils/custom-websocket.dart';
@@ -7,6 +8,8 @@ typedef OnNotifySetRemoteMediaStreamEvent = void Function(String id);
 typedef OnRemoveRemoteParticipantEvent = void Function(String id);
 
 class Session {
+  final _logger = Logger("Session");
+
   LocalParticipant? localParticipant;
   Map<String, RemoteParticipant> remoteParticipants = {};
   String id;

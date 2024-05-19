@@ -5,11 +5,12 @@ import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:openviduflutter/api/api-service.dart';
-import 'package:openviduflutter/main.dart';
 import 'package:openviduflutter/participant/local-participant.dart';
 import 'package:openviduflutter/participant/participant.dart';
+import 'package:openviduflutter/screens/prepare_videocall.dart';
 import 'package:openviduflutter/utils/custom-websocket.dart';
 import 'package:openviduflutter/utils/session.dart';
+import 'package:openviduflutter/widgets/custom_draggable.dart';
 
 class VideocallWidget extends StatefulWidget {
   const VideocallWidget({
@@ -35,27 +36,17 @@ class _VideocallWidgetState extends State<VideocallWidget> {
   late ApiService apiService;
   Session? session;
 
-  double _xPosition = 0.0;
-  double _yPosition = 0.0;
-
   @override
   void initState() {
     super.initState();
     apiService = ApiService(widget.sessionId, widget.server, widget.secret);
     _connect();
-
-    Future.delayed(Duration.zero, () {
-      setState(() {
-        _xPosition = MediaQuery.of(context).size.width - 100;
-        _yPosition = MediaQuery.of(context).size.height - 300;
-      });
-    });
   }
 
   void _hangUp() {
     if (session != null) {
-      Navigator.of(context)
-          .pushReplacement(MaterialPageRoute(builder: (context) => const MyHome()));
+      Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const PrepareVideocall()));
     }
   }
 
@@ -225,45 +216,11 @@ class _VideocallWidgetState extends State<VideocallWidget> {
       ),
       (session?.remoteParticipants.entries ?? []).isEmpty
           ? const SizedBox.shrink()
-          : Positioned(
-              left: _xPosition,
-              top: _yPosition,
-              child: Draggable(
-                feedback: Container(
-                  width: 100.0,
-                  height: 150.0,
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  child: Container(),
-                ),
-                child: buildLocalRenderer(),
-                onDragEnd: (details) {
-                  if (context.mounted) {
-                    setState(() {
-                      if (details.offset.dx < 0) {
-                        _xPosition = 0;
-                      } else if (details.offset.dx >
-                          MediaQuery.of(context).size.width - 100) {
-                        _xPosition = MediaQuery.of(context).size.width - 100;
-                      } else {
-                        _xPosition = details.offset.dx;
-                      }
-                      if (details.offset.dy < 0) {
-                        _yPosition = 0;
-                      } else if (details.offset.dy >
-                          MediaQuery.of(context).size.height - 150) {
-                        _yPosition = MediaQuery.of(context).size.height - 225;
-                      } else {
-                        _yPosition = details.offset.dy - 75;
-                      }
-                    });
-                  }
-                },
-              ),
-            ),
+          : CustomDraggable(
+              initialX: MediaQuery.of(context).size.width - 100,
+              initialY: MediaQuery.of(context).size.height - 300,
+              child: buildLocalRenderer(),
+            )
     ]);
   }
 

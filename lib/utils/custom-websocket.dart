@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:logging/logging.dart';
 import 'package:openviduflutter/constants/json-constants.dart';
 import 'package:openviduflutter/participant/remote-participant.dart';
 import 'package:openviduflutter/utils/pair.dart';
@@ -12,7 +13,8 @@ typedef OnErrorEvent = void Function(String error);
 typedef OnRemoteParticipantStreamChangeEvent = void Function();
 
 class CustomWebSocket {
-  final String tag = "CustomWebSocketListener";
+  final _logger = Logger("CustomWebSocket");
+
   final int pingMessageInterval = 5;
   final Session session;
   WebSocket? webSocket;
@@ -75,7 +77,7 @@ class CustomWebSocket {
     final result = json[JsonConstants.result];
 
     if (result.containsKey('value') && result['value'] == 'pong') {
-      print('pong');
+      _logger.info('pong');
     } else if (rpcId == idJoinRoom) {
       //session.setStateConnected();
       final localParticipant = session.localParticipant;
@@ -157,7 +159,7 @@ class CustomWebSocket {
     } else if (idsOnIceCandidate.contains(rpcId)) {
       idsOnIceCandidate.remove(rpcId);
     } else {
-      print('Unrecognized server response: $result');
+      _logger.severe('Unrecognized server response: $result');
     }
   }
 
@@ -165,19 +167,19 @@ class CustomWebSocket {
     final error = json[JsonConstants.error];
     final errorCode = error['code'];
     final errorMessage = error['message'];
-    print('Server error code $errorCode: $errorMessage');
+    _logger.severe('Server error code $errorCode: $errorMessage');
   }
 
   void handleServerEvent(Map<String, dynamic> json) {
     if (!json.containsKey(JsonConstants.method)) {
-      print(
+      _logger.severe(
           "Server event lacks a field '${JsonConstants.method}'; JSON: $json");
       return;
     }
     final method = json[JsonConstants.method];
 
     if (!json.containsKey(JsonConstants.params)) {
-      print(
+      _logger.severe(
           "Server event '$method' lacks a field '${JsonConstants.params}'; JSON: $json");
       return;
     }
@@ -200,11 +202,11 @@ class CustomWebSocket {
         streamPropertyChangedEvent(params);
         break;
       default:
-        print(
+        _logger.severe(
             " *************************************************************** ");
-        print(
+        _logger.severe(
             " *************** Unknown server event '$method'  *************** ");
-        print(
+        _logger.severe(
             " *************************************************************** ");
     }
   }
@@ -330,7 +332,8 @@ class CustomWebSocket {
 
     switch (pc!.signalingState) {
       case RTCSignalingState.RTCSignalingStateClosed:
-        print('saveIceCandidate error: PeerConnection object is closed');
+        _logger
+            .warning('saveIceCandidate error: PeerConnection object is closed');
         break;
       case RTCSignalingState.RTCSignalingStateStable:
         if (await pc.getRemoteDescription() != null) {
