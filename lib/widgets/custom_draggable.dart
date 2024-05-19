@@ -49,7 +49,7 @@ class _CustomDraggableState extends State<CustomDraggable> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Icon(
-                  Icons.video_call,
+                  Icons.open_with,
                   color: Colors.white,
                 ),
               ],
@@ -72,9 +72,10 @@ class _CustomDraggableState extends State<CustomDraggable> {
               if (newY < 0) {
                 _yPosition = 0;
               } else if (newY > MediaQuery.of(context).size.height - 150) {
-                _yPosition = MediaQuery.of(context).size.height - 225;
+                _yPosition = MediaQuery.of(context).size.height -
+                    (150 + widget.height / 2);
               } else {
-                _yPosition = newY;
+                _yPosition = newY - widget.height / 2;
               }
             });
           }

@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:crypto/crypto.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:openviduflutter/api/api-service.dart';
@@ -11,6 +10,7 @@ import 'package:openviduflutter/screens/prepare_videocall.dart';
 import 'package:openviduflutter/utils/custom-websocket.dart';
 import 'package:openviduflutter/utils/session.dart';
 import 'package:openviduflutter/widgets/custom_draggable.dart';
+import 'package:openviduflutter/widgets/participant_widget.dart';
 
 class VideocallWidget extends StatefulWidget {
   const VideocallWidget({
@@ -219,8 +219,7 @@ class _VideocallWidgetState extends State<VideocallWidget> {
           : CustomDraggable(
               initialX: MediaQuery.of(context).size.width - 100,
               initialY: MediaQuery.of(context).size.height - 300,
-              child: buildLocalRenderer(),
-            )
+              child: buildLocalRenderer())
     ]);
   }
 
@@ -309,55 +308,8 @@ class _VideocallWidgetState extends State<VideocallWidget> {
 
   Widget buildRendererContainer(MapEntry<String, Participant> remotePair) {
     return Expanded(
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.black,
-          border: Border.all(color: Colors.grey),
-          borderRadius: BorderRadius.circular(8.0),
-        ),
-        child: Stack(
-          children: [
-            remotePair.value.isVideoActive
-                ? RTCVideoView(remotePair.value.renderer)
-                : _noVideoInitial(remotePair.value.participantName),
-            Positioned(
-                child: Container(
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.6),
-                borderRadius:
-                    const BorderRadius.only(bottomRight: Radius.circular(8.0)),
-              ),
-              padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-              child: Text(
-                remotePair.value.participantName,
-                style: const TextStyle(color: Colors.white),
-              ),
-            )),
-            Positioned(
-              bottom: 0,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.6),
-                  borderRadius: const BorderRadius.only(
-                      bottomRight: Radius.circular(8.0)),
-                ),
-                padding:
-                    const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
-                child: Row(
-                  children: [
-                    remotePair.value.isAudioActive
-                        ? const Icon(Icons.mic, color: Colors.white)
-                        : const Icon(Icons.mic_off, color: Colors.white),
-                    const SizedBox(width: 8),
-                    remotePair.value.isVideoActive
-                        ? const Icon(Icons.videocam, color: Colors.white)
-                        : const Icon(Icons.videocam_off, color: Colors.white),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
+      child: ParticipantWidget(
+        participant: remotePair.value,
       ),
     );
   }
