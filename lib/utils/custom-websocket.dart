@@ -7,10 +7,9 @@ import 'package:logging/logging.dart';
 import 'package:openviduflutter/constants/json-constants.dart';
 import 'package:openviduflutter/participant/remote-participant.dart';
 import 'package:openviduflutter/utils/pair.dart';
-import 'session.dart'; // Assuming you have a Session class implemented
+import 'session.dart';
 
 typedef OnErrorEvent = void Function(String error);
-typedef OnRemoteParticipantStreamChangeEvent = void Function();
 
 class CustomWebSocket {
   final _logger = Logger("CustomWebSocket");
@@ -30,14 +29,11 @@ class CustomWebSocket {
   final Set<int> idsOnIceCandidate = <int>{};
   String? mediaServer;
   OnErrorEvent? onErrorEvent;
-  OnRemoteParticipantStreamChangeEvent? onRemoteParticipantStreamChangeEvent;
 
   CustomWebSocket(this.session);
 
   void connect() async {
     try {
-      //final uri = Uri.parse(getWebSocketAddress());
-      //channel = WebSocketChannel.connect(uri);
       webSocket = await WebSocket.connect(getWebSocketAddress());
 
       webSocket!.listen((data) {
@@ -79,7 +75,6 @@ class CustomWebSocket {
     if (result.containsKey('value') && result['value'] == 'pong') {
       _logger.info('pong');
     } else if (rpcId == idJoinRoom) {
-      //session.setStateConnected();
       final localParticipant = session.localParticipant;
       final localConnectionId = result[JsonConstants.id];
       localParticipant!.connectionId = localConnectionId;
@@ -377,8 +372,8 @@ class CustomWebSocket {
         remoteParticipant.changeMicrophoneStatus(bool.parse(newValue));
       }
 
-      if (onRemoteParticipantStreamChangeEvent != null) {
-        onRemoteParticipantStreamChangeEvent!();
+      if (remoteParticipant.onStreamChangeEvent != null) {
+        remoteParticipant.onStreamChangeEvent!(params);
       }
     }
   }

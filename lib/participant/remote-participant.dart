@@ -1,7 +1,12 @@
 import 'package:openviduflutter/utils/session.dart';
 import 'participant.dart';
 
+typedef OnRemoteParticipantStreamChangeEvent = void Function(
+    Map<String, dynamic>);
+
 class RemoteParticipant extends Participant {
+  OnRemoteParticipantStreamChangeEvent? onStreamChangeEvent;
+
   RemoteParticipant(
       String connectionId, String participantName, Session session)
       : super.withConnectionId(connectionId, participantName, session) {

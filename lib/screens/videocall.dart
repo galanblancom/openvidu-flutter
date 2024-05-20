@@ -82,22 +82,19 @@ class _VideocallWidgetState extends State<VideocallWidget> {
     super.dispose();
   }
 
-  refresh() {
+  void refresh() {
     if (context.mounted) {
       setState(() {});
     }
   }
 
-  startWebSocket() {
+  void startWebSocket() {
     CustomWebSocket webSocket = CustomWebSocket(session!);
     webSocket.onErrorEvent = (error) {
       if (context.mounted) {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text(error)));
       }
-    };
-    webSocket.onRemoteParticipantStreamChangeEvent = () {
-      refresh();
     };
     webSocket.connect();
     session?.setWebSocket(webSocket);
@@ -219,7 +216,10 @@ class _VideocallWidgetState extends State<VideocallWidget> {
           : CustomDraggable(
               initialX: MediaQuery.of(context).size.width - 100,
               initialY: MediaQuery.of(context).size.height - 300,
-              child: buildLocalRenderer())
+              width: 100,
+              height: 150,
+              child: buildLocalRenderer(),
+            )
     ]);
   }
 

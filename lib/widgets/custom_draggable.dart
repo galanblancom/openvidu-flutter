@@ -63,17 +63,19 @@ class _CustomDraggableState extends State<CustomDraggable> {
 
               if (newX < 0) {
                 _xPosition = 0;
-              } else if (newX > MediaQuery.of(context).size.width - 100) {
-                _xPosition = MediaQuery.of(context).size.width - 100;
+              } else if (newX >
+                  MediaQuery.of(context).size.width - widget.width) {
+                _xPosition = MediaQuery.of(context).size.width - widget.width;
               } else {
                 _xPosition = newX;
               }
 
               if (newY < 0) {
                 _yPosition = 0;
-              } else if (newY > MediaQuery.of(context).size.height - 150) {
+              } else if (newY >
+                  MediaQuery.of(context).size.height - widget.height) {
                 _yPosition = MediaQuery.of(context).size.height -
-                    (150 + widget.height / 2);
+                    (widget.height + widget.height / 2);
               } else {
                 _yPosition = newY - widget.height / 2;
               }

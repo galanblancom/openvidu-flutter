@@ -4,11 +4,34 @@ import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:openviduflutter/participant/participant.dart';
+import 'package:openviduflutter/participant/remote-participant.dart';
 
-class ParticipantWidget extends StatelessWidget {
+class ParticipantWidget extends StatefulWidget {
   final Participant participant;
 
   const ParticipantWidget({super.key, required this.participant});
+
+  @override
+  _ParticipantWidgetState createState() => _ParticipantWidgetState();
+}
+
+class _ParticipantWidgetState extends State<ParticipantWidget> {
+  void refresh() {
+    if (context.mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
+  void initState() {
+    if (widget.participant is RemoteParticipant) {
+      (widget.participant as RemoteParticipant).onStreamChangeEvent =
+          (Map<String, dynamic> params) {
+        refresh();
+      };
+    }
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,9 +43,9 @@ class ParticipantWidget extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          participant.isVideoActive
-              ? RTCVideoView(participant.renderer)
-              : _noVideoPlaceholder(participant.participantName),
+          widget.participant.isVideoActive
+              ? RTCVideoView(widget.participant.renderer)
+              : _noVideoPlaceholder(widget.participant.participantName),
           Positioned(
             child: Container(
               decoration: BoxDecoration(
@@ -32,7 +55,7 @@ class ParticipantWidget extends StatelessWidget {
               ),
               padding: const EdgeInsets.only(left: 8.0, right: 8.0),
               child: Text(
-                participant.participantName,
+                widget.participant.participantName,
                 style: const TextStyle(color: Colors.white),
               ),
             ),
@@ -49,11 +72,11 @@ class ParticipantWidget extends StatelessWidget {
                   const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
               child: Row(
                 children: [
-                  participant.isAudioActive
+                  widget.participant.isAudioActive
                       ? const Icon(Icons.mic, color: Colors.white)
                       : const Icon(Icons.mic_off, color: Colors.white),
                   const SizedBox(width: 8),
-                  participant.isVideoActive
+                  widget.participant.isVideoActive
                       ? const Icon(Icons.videocam, color: Colors.white)
                       : const Icon(Icons.videocam_off, color: Colors.white),
                 ],
