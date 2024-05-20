@@ -157,7 +157,7 @@ class PenkalaError {
         print('URL: ${config.uri.toString()}');
         print('Headers: ${config.headers.toString()}');
         print('Body: ${config.body?.getBody()}');
-        print('Data: ${responseData ?? ''}');
+        print('Data: $responseData');
         break;
     }
 
@@ -169,7 +169,7 @@ class PenkalaError {
     } else {
       try {
         if (errorJson.containsKey('errors')) {
-          final List<dynamic> errors = errorJson['errors'];
+          print(errorJson['errors']);
         } else {
           _presentableError
               .writeln(errorJson['error_msg'] ?? 'Something went wrong!');
