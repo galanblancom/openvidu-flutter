@@ -13,6 +13,12 @@ All notable changes to the `OpenVidu Flutter` project will be documented in this
 - Managing changes in the flow of remote participants.
 - The status of the participant's microphone and camera is displayed.
 
+## [0.0.2] - 2024-05-20
+- Fixed Warnings
+
+## [0.0.3] - 2024-05-20
+- Image url fixed
+
 ### Changed
 
 ### Deprecated
