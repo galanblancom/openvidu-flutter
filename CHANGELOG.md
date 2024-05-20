@@ -22,6 +22,9 @@ All notable changes to the `OpenVidu Flutter` project will be documented in this
 ## [0.0.4] - 2024-05-20
 - Refactorizations
 
+## [0.0.5] - 2024-05-20
+- Fixed homepage url
+
 ### Changed
 
 ### Deprecated
