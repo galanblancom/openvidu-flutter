@@ -1,9 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'dart:io';
 
-import 'package:openviduflutter/api/request-config.dart';
+import 'package:openvidu_flutter/api/request-config.dart';
 
 class ApiClient {
   final HttpClient client = HttpClient();

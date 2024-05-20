@@ -4,9 +4,9 @@ import 'dart:io';
 
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:logging/logging.dart';
-import 'package:openviduflutter/constants/json-constants.dart';
-import 'package:openviduflutter/participant/remote-participant.dart';
-import 'package:openviduflutter/utils/pair.dart';
+import 'package:openvidu_flutter/constants/json-constants.dart';
+import 'package:openvidu_flutter/participant/remote-participant.dart';
+import 'package:openvidu_flutter/utils/pair.dart';
 import 'session.dart';
 
 typedef OnErrorEvent = void Function(String error);

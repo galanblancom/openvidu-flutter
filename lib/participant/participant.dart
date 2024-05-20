@@ -1,7 +1,6 @@
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'dart:async';
-
-import 'package:openviduflutter/utils/session.dart';
+import 'package:openvidu_flutter/utils/session.dart';
 
 class Participant {
   String? connectionId;

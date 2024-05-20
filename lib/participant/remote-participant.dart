@@ -1,5 +1,5 @@
-import 'package:openviduflutter/utils/session.dart';
-import 'participant.dart';
+import 'package:openvidu_flutter/participant/participant.dart';
+import 'package:openvidu_flutter/utils/session.dart';
 
 typedef OnRemoteParticipantStreamChangeEvent = void Function(
     Map<String, dynamic>);

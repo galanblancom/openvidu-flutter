@@ -1,5 +1,5 @@
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:openviduflutter/utils/session.dart';
+import 'package:openvidu_flutter/utils/session.dart';
 import 'participant.dart';
 
 class LocalParticipant extends Participant {

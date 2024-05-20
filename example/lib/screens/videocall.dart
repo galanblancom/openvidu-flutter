@@ -1,16 +1,17 @@
 import 'dart:convert';
 import 'dart:math';
+
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:openviduflutter/api/api-service.dart';
-import 'package:openviduflutter/participant/local-participant.dart';
-import 'package:openviduflutter/participant/participant.dart';
-import 'package:openviduflutter/screens/prepare_videocall.dart';
-import 'package:openviduflutter/utils/custom-websocket.dart';
-import 'package:openviduflutter/utils/session.dart';
-import 'package:openviduflutter/widgets/custom_draggable.dart';
-import 'package:openviduflutter/widgets/participant_widget.dart';
+import 'package:openvidu_flutter/api/api-service.dart';
+import 'package:openvidu_flutter/participant/local-participant.dart';
+import 'package:openvidu_flutter/participant/participant.dart';
+import 'package:openvidu_flutter/utils/custom-websocket.dart';
+import 'package:openvidu_flutter/utils/session.dart';
+import 'package:openvidu_flutter/widgets/custom_draggable.dart';
+import 'package:openvidu_flutter/widgets/participant_widget.dart';
+import 'package:openvidu_flutter_example/screens/prepare_videocall.dart';
 
 class VideocallWidget extends StatefulWidget {
   const VideocallWidget({

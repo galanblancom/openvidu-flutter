@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:openviduflutter/participant/participant.dart';
-import 'package:openviduflutter/participant/remote-participant.dart';
+import 'package:openvidu_flutter/participant/participant.dart';
+import 'package:openvidu_flutter/participant/remote-participant.dart';
 
 class ParticipantWidget extends StatefulWidget {
   final Participant participant;
