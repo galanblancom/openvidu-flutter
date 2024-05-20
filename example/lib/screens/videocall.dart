@@ -1,14 +1,11 @@
-import 'dart:convert';
-import 'dart:math';
-
-import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:openvidu_flutter/api/api-service.dart';
-import 'package:openvidu_flutter/participant/local-participant.dart';
+import 'package:openvidu_flutter/api/api_service.dart';
+import 'package:openvidu_flutter/participant/local_participant.dart';
 import 'package:openvidu_flutter/participant/participant.dart';
-import 'package:openvidu_flutter/utils/custom-websocket.dart';
+import 'package:openvidu_flutter/utils/custom_websocket.dart';
 import 'package:openvidu_flutter/utils/session.dart';
+import 'package:openvidu_flutter/utils/utils.dart';
 import 'package:openvidu_flutter/widgets/custom_draggable.dart';
 import 'package:openvidu_flutter/widgets/participant_widget.dart';
 import 'package:openvidu_flutter_example/screens/prepare_videocall.dart';
@@ -30,7 +27,7 @@ class VideocallWidget extends StatefulWidget {
   final String iceServer;
 
   @override
-  _VideocallWidgetState createState() => _VideocallWidgetState();
+  State<VideocallWidget> createState() => _VideocallWidgetState();
 }
 
 class _VideocallWidgetState extends State<VideocallWidget> {
@@ -283,28 +280,6 @@ class _VideocallWidgetState extends State<VideocallWidget> {
         ],
       ),
     );
-  }
-
-  Color getRandomLightColor() {
-    final Random random = Random();
-    // Generate random RGB values between 128 and 255 to ensure light colors
-    int red = 128 + random.nextInt(128); // 128-255
-    int green = 128 + random.nextInt(128); // 128-255
-    int blue = 128 + random.nextInt(128); // 128-255
-    return Color.fromARGB(255, red, green, blue);
-  }
-
-  Color getColorFromString(String input) {
-    // Hash the input string using SHA-256
-    var bytes = utf8.encode(input);
-    var digest = sha256.convert(bytes);
-
-    // Use the first 3 bytes of the hash to generate RGB values
-    int red = (digest.bytes[0] % 128) + 128; // 128-255
-    int green = (digest.bytes[1] % 128) + 128; // 128-255
-    int blue = (digest.bytes[2] % 128) + 128; // 128-255
-
-    return Color.fromARGB(255, red, green, blue);
   }
 
   Widget buildRendererContainer(MapEntry<String, Participant> remotePair) {

@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'api_client.dart';
+import 'request_config.dart';
+import 'package:logging/logging.dart';
 
-import 'api-client.dart';
-import 'request-config.dart';
+var _logger = Logger('ApiService');
 
 class ApiService {
   final String sessionId;
@@ -28,7 +30,7 @@ class ApiService {
         .then((dynamic jsonResponse) {
       return jsonResponse;
     }).catchError((error) {
-      print('createSession error: $error');
+      _logger.info('createSession error: $error');
       return sessionId;
     });
   }

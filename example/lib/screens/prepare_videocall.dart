@@ -12,7 +12,7 @@ class PrepareVideocall extends StatefulWidget {
   const PrepareVideocall({super.key});
 
   @override
-  _PrepareVideocallState createState() => _PrepareVideocallState();
+  State<PrepareVideocall> createState() => _PrepareVideocallState();
 }
 
 class _PrepareVideocallState extends State<PrepareVideocall> {

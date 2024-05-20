@@ -1,7 +1,7 @@
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:openvidu_flutter/participant/local-participant.dart';
-import 'package:openvidu_flutter/participant/remote-participant.dart';
-import 'package:openvidu_flutter/utils/custom-websocket.dart';
+import 'package:openvidu_flutter/participant/local_participant.dart';
+import 'package:openvidu_flutter/participant/remote_participant.dart';
+import 'package:openvidu_flutter/utils/custom_websocket.dart';
 
 typedef OnNotifySetRemoteMediaStreamEvent = void Function(String id);
 typedef OnRemoveRemoteParticipantEvent = void Function(String id);

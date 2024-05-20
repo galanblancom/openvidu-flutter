@@ -2,7 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:openvidu_flutter/api/request-config.dart';
+import 'package:logging/logging.dart';
+import 'package:openvidu_flutter/api/request_config.dart';
+
+var _logger = Logger('ApiClient');
 
 class ApiClient {
   final HttpClient client = HttpClient();
@@ -14,7 +17,8 @@ class ApiClient {
 
   /// Use this instead of [getAction], [postAction] and [putAction]
   Future<dynamic> request(Config config, {bool autoLogin = false}) async {
-    print('[${config.method}] Sending request: ${config.uri.toString()}');
+    _logger
+        .info('[${config.method}] Sending request: ${config.uri.toString()}');
 
     final HttpClientRequest clientRequest = await client
         .openUrl(config.method, config.uri)
@@ -24,7 +28,7 @@ class ApiClient {
 
     final HttpClientResponse response = await clientRequest.close();
 
-    print(
+    _logger.info(
         '[${config.method}] Received: ${response.reasonPhrase} [${response.statusCode}] - ${config.uri.toString()}');
 
     if (response.statusCode == HttpStatus.ok) {
@@ -103,7 +107,7 @@ class PenkalaError {
   /// Will set up error type and string for specific error
   /// Toggles [shouldShow] flag to false if error dialog is not needed to pop up for this error
   Future<Null> _processError() async {
-    print(
+    _logger.info(
         'Processing error : [${response.statusCode}] - ${response.reasonPhrase}');
     final String responseData = await utf8.decodeStream(response);
     final Map<dynamic, dynamic> errorJson = jsonDecode(responseData);
@@ -152,32 +156,33 @@ class PenkalaError {
       default:
         errorType = ErrorType.unknown;
 
-        print(
+        _logger.info(
             'UNKNOWN ERROR! ${response.statusCode} - [${response.reasonPhrase}]');
-        print('URL: ${config.uri.toString()}');
-        print('Headers: ${config.headers.toString()}');
-        print('Body: ${config.body?.getBody()}');
-        print('Data: $responseData');
+        _logger.info('URL: ${config.uri.toString()}');
+        _logger.info('Headers: ${config.headers.toString()}');
+        _logger.info('Body: ${config.body?.getBody()}');
+        _logger.info('Data: $responseData');
+
         break;
     }
 
     if (errorType == ErrorType.sessionAlready) {
       _presentableError.writeln('409 - Session already created. Join in..');
-      print(_presentableError);
+      _logger.info(_presentableError);
     } else if (errorType == ErrorType.badGateway) {
       _presentableError.writeln('502 - Bad Gateway (deploy is on the way?)');
     } else {
       try {
         if (errorJson.containsKey('errors')) {
-          print(errorJson['errors']);
+          _logger.info(errorJson['errors']);
         } else {
           _presentableError
               .writeln(errorJson['error_msg'] ?? 'Something went wrong!');
         }
 
-        print('Error: ${errorType.toString()}');
+        _logger.info('Error: ${errorType.toString()}');
       } catch (exception) {
-        print('Exception proccessing error: $exception');
+        _logger.info('Exception proccessing error: $exception');
       }
     }
   }

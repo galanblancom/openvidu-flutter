@@ -4,15 +4,14 @@ import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:openvidu_flutter/participant/participant.dart';
-import 'package:openvidu_flutter/participant/remote-participant.dart';
+import 'package:openvidu_flutter/participant/remote_participant.dart';
 
 class ParticipantWidget extends StatefulWidget {
   final Participant participant;
-
   const ParticipantWidget({super.key, required this.participant});
 
   @override
-  _ParticipantWidgetState createState() => _ParticipantWidgetState();
+  State<ParticipantWidget> createState() => _ParticipantWidgetState();
 }
 
 class _ParticipantWidgetState extends State<ParticipantWidget> {

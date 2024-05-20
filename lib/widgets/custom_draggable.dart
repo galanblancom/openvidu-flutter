@@ -17,7 +17,7 @@ class CustomDraggable extends StatefulWidget {
   });
 
   @override
-  _CustomDraggableState createState() => _CustomDraggableState();
+  State<CustomDraggable> createState() => _CustomDraggableState();
 }
 
 class _CustomDraggableState extends State<CustomDraggable> {

@@ -4,8 +4,8 @@ import 'dart:io';
 
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:logging/logging.dart';
-import 'package:openvidu_flutter/constants/json-constants.dart';
-import 'package:openvidu_flutter/participant/remote-participant.dart';
+import 'package:openvidu_flutter/constants/json_constants.dart';
+import 'package:openvidu_flutter/participant/remote_participant.dart';
 import 'package:openvidu_flutter/utils/pair.dart';
 import 'session.dart';
 
@@ -434,13 +434,13 @@ class CustomWebSocket {
   }
 
   void onConnected() {
-    print('Connected');
+    _logger.info('Connected');
     pingMessageHandler();
     joinRoom();
   }
 
   void onDisconnected() {
-    print('Disconnected');
+    _logger.info('Disconnected');
     websocketCancelled = true;
   }
 
@@ -494,7 +494,8 @@ class CustomWebSocket {
       } catch (e) {
         // Sometimes when entering a room, the other participants have no stream
         // Catching this to prevent stopping the iteration of participants
-        print('Error in addRemoteParticipantsAlreadyInRoom: ${e.toString()}');
+        _logger.info(
+            'Error in addRemoteParticipantsAlreadyInRoom: ${e.toString()}');
       }
     }
   }
