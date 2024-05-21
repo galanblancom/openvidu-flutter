@@ -90,10 +90,9 @@ class _CustomDraggableState extends State<CustomDraggable> {
                 _yPosition = 0;
               } else if (newY >
                   MediaQuery.of(context).size.height - widget.height) {
-                _yPosition = MediaQuery.of(context).size.height -
-                    (widget.height + widget.height / 2);
+                _yPosition = MediaQuery.of(context).size.height - widget.height;
               } else {
-                _yPosition = newY - widget.height / 2;
+                _yPosition = newY;
               }
             });
           }

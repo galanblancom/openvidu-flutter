@@ -15,6 +15,7 @@ class ParticipantWidget extends StatefulWidget {
 }
 
 class _ParticipantWidgetState extends State<ParticipantWidget> {
+  /// Refreshes the participant widget.
   void refresh() {
     if (context.mounted) {
       setState(() {});

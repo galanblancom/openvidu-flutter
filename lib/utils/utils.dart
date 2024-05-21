@@ -4,6 +4,7 @@ import 'dart:ui';
 
 import 'package:crypto/crypto.dart';
 
+/// Generates a random color
 Color getRandomLightColor() {
   final Random random = Random();
   // Generate random RGB values between 128 and 255 to ensure light colors
@@ -13,6 +14,7 @@ Color getRandomLightColor() {
   return Color.fromARGB(255, red, green, blue);
 }
 
+/// Generates a color from a given string
 Color getColorFromString(String input) {
   // Hash the input string using SHA-256
   var bytes = utf8.encode(input);

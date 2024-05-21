@@ -123,6 +123,11 @@ class _VideocallWidgetState extends State<VideocallWidget> {
         });
 
         startWebSocket();
+      }).catchError((error) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(error.toString())));
+        }
       });
     });
   }

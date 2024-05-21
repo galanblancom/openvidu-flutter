@@ -31,6 +31,9 @@ All notable changes to the `OpenVidu Flutter` project will be documented in this
 ## [0.0.7] - 2024-05-21
 - Added support for a customClient in websocket
 
+## [0.0.8] - 2024-05-21
+- Added some documentation
+
 ### Changed
 
 ### Deprecated

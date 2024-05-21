@@ -38,14 +38,17 @@ class Session {
     _initialize();
   }
 
+  /// Initializes the WebRTC library
   Future<void> _initialize() async {
     await WebRTC.initialize();
   }
 
+  /// Sets the WebSocket object
   void setWebSocket(CustomWebSocket websocket) {
     this.websocket = websocket;
   }
 
+  /// Creates a local peer connection
   Future<RTCPeerConnection> createLocalPeerConnection() async {
     RTCPeerConnection peerConnection =
         await createPeerConnection(_configuration);
@@ -82,6 +85,7 @@ class Session {
     return peerConnection;
   }
 
+  /// Creates a remote peer connection
   Future<void> createRemotePeerConnection(String connectionId) async {
     RTCPeerConnection peerConnection =
         await createPeerConnection(_configuration);
@@ -117,6 +121,7 @@ class Session {
     remoteParticipants[connectionId]!.peerConnection = peerConnection;
   }
 
+  /// Creates an offer for publishing
   Future<void> createOfferForPublishing(
       Map<String, dynamic> constraints) async {
     RTCSessionDescription offer =
@@ -126,6 +131,7 @@ class Session {
         .then((_) => websocket.publishVideo(offer));
   }
 
+  /// Creates an answer for subscribing
   Future<void> createAnswerForSubscribing(RemoteParticipant remoteParticipant,
       String streamId, Map<String, dynamic> constraints) async {
     RTCSessionDescription answer =
@@ -134,20 +140,24 @@ class Session {
         (_) => websocket.receiveVideoFrom(answer, remoteParticipant, streamId));
   }
 
+  /// Sets the ICE servers
   void setIceServers(List<Map<String, dynamic>> iceServers) {
     this.iceServers = iceServers;
   }
 
+  /// Adds a remote participant
   void addRemoteParticipant(RemoteParticipant remoteParticipant) {
     remoteParticipants[remoteParticipant.connectionId!] = remoteParticipant;
   }
 
+  /// Removes a remote participant
   Future<void> removeRemoteParticipant(String id) async {
     await remoteParticipants[id]?.renderer.dispose();
     await remoteParticipants.remove(id)?.dispose();
     onRemoveRemoteParticipant!(id);
   }
 
+  /// Leaves the session
   void leaveSession() async {
     websocket.leaveRoom();
     await websocket.disconnect();
@@ -171,12 +181,14 @@ class Session {
     });
   }
 
+  /// Toggles the local audio
   void localToggleAudio() {
     localParticipant!.toggleAudio();
     websocket.changeStreamAudio(
         localParticipant!.connectionId!, localParticipant!.isAudioActive);
   }
 
+  /// Toggles the local video
   void localToggleVideo() {
     localParticipant!.toggleVideo();
     websocket.changeStreamVideo(

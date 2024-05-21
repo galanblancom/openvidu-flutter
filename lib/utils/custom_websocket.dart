@@ -33,6 +33,7 @@ class CustomWebSocket {
 
   CustomWebSocket(this.session, {this.customClient});
 
+  /// Connects to the WebSocket server
   void connect() async {
     try {
       webSocket = await WebSocket.connect(getWebSocketAddress(),
@@ -53,12 +54,14 @@ class CustomWebSocket {
     }
   }
 
+  /// Returns the WebSocket address
   String getWebSocketAddress() {
     final uri = Uri.parse(session.token);
     final port = uri.port != -1 ? ':${uri.port}' : '';
     return '${uri.scheme}://${uri.host}$port/openvidu';
   }
 
+  /// Handles the text message received from the WebSocket server
   void onTextMessage(String text) async {
     final json = jsonDecode(text);
     if (json.containsKey(JsonConstants.result)) {
@@ -70,6 +73,7 @@ class CustomWebSocket {
     }
   }
 
+  /// Handles the server response
   Future<void> handleServerResponse(Map<String, dynamic> json) async {
     final rpcId = json[JsonConstants.id];
     final result = json[JsonConstants.result];
@@ -160,6 +164,7 @@ class CustomWebSocket {
     }
   }
 
+  /// Handles the server error
   void handleServerError(Map<String, dynamic> json) {
     final error = json[JsonConstants.error];
     final errorCode = error['code'];
@@ -167,6 +172,7 @@ class CustomWebSocket {
     _logger.severe('Server error code $errorCode: $errorMessage');
   }
 
+  /// Handles the server event
   void handleServerEvent(Map<String, dynamic> json) {
     if (!json.containsKey(JsonConstants.method)) {
       _logger.severe(
@@ -208,6 +214,7 @@ class CustomWebSocket {
     }
   }
 
+  /// Sends the joinRoom to WebSocket server
   void joinRoom() {
     final joinRoomParams = {
       JsonConstants.metadata:
@@ -222,10 +229,12 @@ class CustomWebSocket {
     idJoinRoom = sendJson(JsonConstants.joinRoomMethod, joinRoomParams);
   }
 
+  /// Sends the leaveRoom to WebSocket server
   void leaveRoom() {
     idLeaveRoom = sendJson(JsonConstants.leaveRoomMethod);
   }
 
+  /// Sends the publishVideo to the WebSocket server
   void publishVideo(RTCSessionDescription sessionDescription) {
     final Map<String, String> publishVideoParams = {
       'audioActive': 'true',
@@ -242,6 +251,8 @@ class CustomWebSocket {
         sendJson(JsonConstants.publishVideoMethod, publishVideoParams);
   }
 
+  /// Sends the streamPropertyChange to the WebSocket server
+  /// Used to change the audio and video status of a stream
   void streamPropertyChange(
       {required String streamId,
       required String property,
@@ -257,6 +268,7 @@ class CustomWebSocket {
         JsonConstants.streamPropertyChangedMethod, streamPropertyChangeParams);
   }
 
+  /// Sends the changeStreamAudio to the WebSocket server
   void changeStreamAudio(String streamId, bool newValue) {
     streamPropertyChange(
       streamId: streamId,
@@ -266,6 +278,7 @@ class CustomWebSocket {
     );
   }
 
+  /// Sends the changeStreamVideo to the WebSocket server
   void changeStreamVideo(String streamId, bool newValue) {
     streamPropertyChange(
       streamId: streamId,
@@ -275,6 +288,7 @@ class CustomWebSocket {
     );
   }
 
+  /// Sends the prepareReceiveVideoFrom to the WebSocket server
   void prepareReceiveVideoFrom(
       RemoteParticipant remoteParticipant, String streamId) {
     final prepareReceiveVideoFromParams = {
@@ -286,6 +300,7 @@ class CustomWebSocket {
         Pair(remoteParticipant.connectionId!, streamId);
   }
 
+  /// Sends the receiveVideoFrom to the WebSocket server
   void receiveVideoFrom(RTCSessionDescription sessionDescription,
       RemoteParticipant remoteParticipant, String streamId) {
     final receiveVideoFromParams = {
@@ -301,6 +316,7 @@ class CustomWebSocket {
         remoteParticipant.connectionId!;
   }
 
+  /// Sends the onIceCandidate to the WebSocket server
   void onIceCandidate(RTCIceCandidate iceCandidate, String? endpointName) {
     final Map<String, String> onIceCandidateParams = {
       'candidate': iceCandidate.candidate!,
@@ -314,6 +330,7 @@ class CustomWebSocket {
         sendJson(JsonConstants.onIceCandidateMethod, onIceCandidateParams));
   }
 
+  /// Handles the iceCandidateEvent response
   Future<void> iceCandidateEvent(Map<String, dynamic> params) async {
     final iceCandidate = RTCIceCandidate(
       params['candidate'],
@@ -403,6 +420,7 @@ class CustomWebSocket {
     return remoteParticipant;
   }
 
+  /// Subscribes to a remote participant
   void subscribe(RemoteParticipant remoteParticipant, String streamId) {
     if (mediaServer == 'kurento') {
       subscriptionInitiatedFromClient(remoteParticipant, streamId);
@@ -435,17 +453,20 @@ class CustomWebSocket {
         remoteParticipant, streamId, sdpConstraints);
   }
 
+  /// Handles the connection to the WebSocket server
   void onConnected() {
     _logger.info('Connected');
     pingMessageHandler();
     joinRoom();
   }
 
+  /// Handles the disconnection from the WebSocket server
   void onDisconnected() {
     _logger.info('Disconnected');
     websocketCancelled = true;
   }
 
+  /// Handles the error from the WebSocket server
   void onError(String error) {
     if (onErrorEvent != null) {
       onErrorEvent!(error);
@@ -453,6 +474,7 @@ class CustomWebSocket {
     session.leaveSession();
   }
 
+  /// Sends a ping message to the WebSocket server
   void pingMessageHandler() {
     pingTimer = Timer.periodic(Duration(seconds: pingMessageInterval), (timer) {
       final pingParams = <String, String>{
@@ -462,6 +484,7 @@ class CustomWebSocket {
     });
   }
 
+  /// Sends a JSON message to the WebSocket server
   int sendJson(String method, [Map<String, dynamic>? params]) {
     final id = rpcId;
     rpcId++;
@@ -478,6 +501,7 @@ class CustomWebSocket {
     return id;
   }
 
+  /// Adds remote participants already in the room
   void addRemoteParticipantsAlreadyInRoom(Map<String, dynamic> result) {
     final List<dynamic> participants = result[JsonConstants.value];
 
@@ -502,6 +526,7 @@ class CustomWebSocket {
     }
   }
 
+  /// Disconnects from the WebSocket server
   disconnect() {
     webSocket?.close();
     pingTimer?.cancel();
