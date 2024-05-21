@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:logging/logging.dart';
-import 'package:openvidu_flutter/api/request_config.dart';
+import 'request_config.dart';
 
 var _logger = Logger('ApiClient');
 

@@ -28,6 +28,9 @@ All notable changes to the `OpenVidu Flutter` project will be documented in this
 ## [0.0.6] - 2024-05-21
 - Added support for bad certificate
 
+## [0.0.7] - 2024-05-21
+- Added support for a customClient in websocket
+
 ### Changed
 
 ### Deprecated

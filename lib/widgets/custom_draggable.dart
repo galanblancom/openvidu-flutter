@@ -1,12 +1,23 @@
 import 'package:flutter/material.dart';
 
 class CustomDraggable extends StatefulWidget {
+  /// The initial X position of the draggable widget
   final double initialX;
+
+  /// The initial Y position of the draggable widget
   final double initialY;
+
+  /// The width of the draggable widget
   final double width;
+
+  /// The height of the draggable widget
   final double height;
+
+  /// The child widget that is to be made draggable
   final Widget child;
 
+  /// Constructor for the CustomDraggable class
+  /// Takes the initial X and Y positions, the child widget, and optionally the width and height of the widget
   const CustomDraggable({
     super.key,
     required this.initialX,
@@ -16,12 +27,17 @@ class CustomDraggable extends StatefulWidget {
     this.height = 150.0,
   });
 
+//// Overriding the createState method to return a new instance of _CustomDraggableState
   @override
   State<CustomDraggable> createState() => _CustomDraggableState();
 }
 
+/// The state class for the CustomDraggable widget
 class _CustomDraggableState extends State<CustomDraggable> {
+  /// The current X position of the draggable widget
   late double _xPosition;
+
+  /// The current Y position of the draggable widget
   late double _yPosition;
 
   @override

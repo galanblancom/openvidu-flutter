@@ -29,12 +29,14 @@ class CustomWebSocket {
   final Set<int> idsOnIceCandidate = <int>{};
   String? mediaServer;
   OnErrorEvent? onErrorEvent;
+  HttpClient? customClient;
 
-  CustomWebSocket(this.session);
+  CustomWebSocket(this.session, {this.customClient});
 
   void connect() async {
     try {
-      webSocket = await WebSocket.connect(getWebSocketAddress());
+      webSocket = await WebSocket.connect(getWebSocketAddress(),
+          customClient: customClient);
 
       webSocket!.listen((data) {
         onTextMessage(data);

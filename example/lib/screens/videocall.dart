@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:openvidu_flutter/api/api_service.dart';
 import 'package:openvidu_flutter/participant/local_participant.dart';
 import 'package:openvidu_flutter/participant/participant.dart';
 import 'package:openvidu_flutter/utils/custom_websocket.dart';
@@ -10,6 +9,7 @@ import 'package:openvidu_flutter/utils/session.dart';
 import 'package:openvidu_flutter/utils/utils.dart';
 import 'package:openvidu_flutter/widgets/custom_draggable.dart';
 import 'package:openvidu_flutter/widgets/participant_widget.dart';
+import 'package:openvidu_flutter_example/api/api_service.dart';
 import 'package:openvidu_flutter_example/screens/prepare_videocall.dart';
 
 class VideocallWidget extends StatefulWidget {
@@ -90,7 +90,12 @@ class _VideocallWidgetState extends State<VideocallWidget> {
   }
 
   void startWebSocket() {
-    CustomWebSocket webSocket = CustomWebSocket(session!);
+    CustomWebSocket webSocket = CustomWebSocket(
+      session!,
+      customClient: HttpClient()
+        ..badCertificateCallback =
+            (X509Certificate cert, String host, int port) => true,
+    );
     webSocket.onErrorEvent = (error) {
       if (context.mounted) {
         ScaffoldMessenger.of(context)
