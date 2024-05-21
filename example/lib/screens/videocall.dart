@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:openvidu_flutter/api/api_service.dart';
@@ -37,7 +39,8 @@ class _VideocallWidgetState extends State<VideocallWidget> {
   @override
   void initState() {
     super.initState();
-    apiService = ApiService(widget.sessionId, widget.server, widget.secret);
+    apiService = ApiService(widget.sessionId, widget.server, widget.secret,
+        (X509Certificate cert, String host, int port) => true);
     _connect();
   }
 

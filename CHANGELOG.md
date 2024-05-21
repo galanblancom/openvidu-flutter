@@ -25,6 +25,9 @@ All notable changes to the `OpenVidu Flutter` project will be documented in this
 ## [0.0.5] - 2024-05-20
 - Fixed homepage url
 
+## [0.0.6] - 2024-05-21
+- Added support for bad certificate
+
 ### Changed
 
 ### Deprecated

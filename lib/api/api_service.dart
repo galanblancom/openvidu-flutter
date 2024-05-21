@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'api_client.dart';
 import 'request_config.dart';
 import 'package:logging/logging.dart';
@@ -9,8 +10,14 @@ class ApiService {
   final String sessionId;
   final String url;
   final String secret;
+  final bool Function(X509Certificate, String, int)? badCertificateCallback;
+  late ApiClient apiClient;
 
-  ApiService(this.sessionId, this.url, this.secret);
+  ApiService(this.sessionId, this.url, this.secret,
+      [this.badCertificateCallback]) {
+    apiClient = ApiClient();
+    apiClient.setBadCertificateCallBack(badCertificateCallback);
+  }
 
   Future<dynamic> createSession() {
     final Map<String, dynamic> bodyMap = <String, dynamic>{
@@ -20,7 +27,7 @@ class ApiService {
       'Authorization':
           'Basic ${base64Encode(utf8.encode('OPENVIDUAPP:$secret'))}'
     };
-    return ApiClient()
+    return apiClient
         .request(Config(
             uri: Uri.parse('https://$url/api/sessions'),
             headers: headersMap,
@@ -43,7 +50,7 @@ class ApiService {
     };
 
     //api/sessions/<SESSION_ID>/connection
-    return ApiClient()
+    return apiClient
         .request(Config(
             uri: Uri.parse('https://$url/api/sessions/$sessionId/connections'),
             headers: headersMap,

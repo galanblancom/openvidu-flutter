@@ -10,6 +10,11 @@ var _logger = Logger('ApiClient');
 class ApiClient {
   final HttpClient client = HttpClient();
 
+  setBadCertificateCallBack(
+      bool Function(X509Certificate, String, int)? callback) {
+    client.badCertificateCallback = callback;
+  }
+
   Map<String, String> get getDefaultHeaders {
     final Map<String, String> defaultHeaders = <String, String>{};
     return defaultHeaders;
