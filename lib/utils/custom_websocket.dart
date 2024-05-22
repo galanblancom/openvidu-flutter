@@ -204,6 +204,9 @@ class CustomWebSocket {
       case JsonConstants.streamPropertyChanged:
         streamPropertyChangedEvent(params);
         break;
+      case JsonConstants.sendMessage:
+        sendMessageEvent(params);
+        break;
       default:
         _logger.severe(
             " *************************************************************** ");
@@ -286,6 +289,15 @@ class CustomWebSocket {
       newValue: newValue,
       reason: 'publishVideo',
     );
+  }
+
+  /// Sends the sendMessage to the WebSocket server
+  sendMessage(String message, String nickname) {
+    final Map<String, String> sendMessageParams = {
+      'message':
+          "{\"to\":[],\"data\":\"{\\\"message\\\":\\\"$message\\\",\\\"nickname\\\":\\\"$nickname\\\"}\",\"type\":\"signal:chat\"}",
+    };
+    sendJson(JsonConstants.sendMessage, sendMessageParams);
   }
 
   /// Sends the prepareReceiveVideoFrom to the WebSocket server
@@ -395,6 +407,10 @@ class CustomWebSocket {
         remoteParticipant.onStreamChangeEvent!(params);
       }
     }
+  }
+
+  void sendMessageEvent(Map<String, dynamic> params) {
+    session.addMessageReceived(params);
   }
 
   RemoteParticipant newRemoteParticipantAux(

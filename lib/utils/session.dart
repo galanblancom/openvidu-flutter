@@ -1,18 +1,28 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:openvidu_flutter/participant/local_participant.dart';
 import 'package:openvidu_flutter/participant/remote_participant.dart';
 import 'package:openvidu_flutter/utils/custom_websocket.dart';
+import 'package:openvidu_flutter/utils/message.dart';
 
 typedef OnNotifySetRemoteMediaStreamEvent = void Function(String id);
 typedef OnRemoveRemoteParticipantEvent = void Function(String id);
+typedef OnMessageReceivedEvent = void Function(Message msg);
 
 class Session {
   LocalParticipant? localParticipant;
   Map<String, RemoteParticipant> remoteParticipants = {};
   String id;
   String token;
+  List<Message> messages = [];
   OnNotifySetRemoteMediaStreamEvent? onNotifySetRemoteMediaStream;
   OnRemoveRemoteParticipantEvent? onRemoveRemoteParticipant;
+  final StreamController<Message> _messageStreamController =
+      StreamController<Message>.broadcast();
+
+  Stream<Message> get messageStream => _messageStreamController.stream;
 
   final List<Map<String, List<String>>> iceServersDefault = [
     {
@@ -166,6 +176,14 @@ class Session {
     for (var remoteParticipant in remoteParticipants.values) {
       remoteParticipant.dispose();
     }
+  }
+
+  void addMessageReceived(Map<String, dynamic> params) {
+    var data = jsonDecode(params['data']);
+    var msg = Message(data['message'], params['from'], data['nickname'],
+        DateTime.now(), localParticipant?.participantName == data['nickname']);
+    messages.add(msg);
+    _messageStreamController.add(msg);
   }
 
   void _setRemoteMediaStream(

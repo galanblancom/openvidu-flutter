@@ -34,6 +34,9 @@ All notable changes to the `OpenVidu Flutter` project will be documented in this
 ## [0.0.8] - 2024-05-21
 - Added some documentation
 
+## [0.0.9] - 2024-05-21
+- Added chat support and chat screen in the example
+
 ### Changed
 
 ### Deprecated

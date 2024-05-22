@@ -1,6 +1,6 @@
 name: openvidu_flutter
 description: 'Migration from openvidu-android to Flutter. The package contains a working example that targets OpenVidu 2.29.0.'
-version: 0.0.8
+version: 0.0.9
 homepage: https://github.com/galanblancom/openvidu-flutter
 
 environment:
@@ -16,6 +16,7 @@ dependencies:
   flutter_webrtc: ^0.10.6
   crypto: ^3.0.3
   logging: ^1.2.0
+  intl: ^0.17.0
 
 dev_dependencies:
   flutter_test:

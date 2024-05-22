@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:openvidu_flutter/utils/session.dart';
 import 'participant.dart';
@@ -30,6 +32,10 @@ class LocalParticipant extends Participant {
       audioTrack!.enabled = !audioTrack!.enabled;
       isAudioActive = audioTrack!.enabled;
     }
+  }
+
+  sendMessage(String message) {
+    session.websocket.sendMessage(message, participantName);
   }
 
   Future<void> startLocalCamera() async {

@@ -7,6 +7,7 @@ import 'package:openvidu_flutter/participant/participant.dart';
 import 'package:openvidu_flutter/utils/custom_websocket.dart';
 import 'package:openvidu_flutter/utils/session.dart';
 import 'package:openvidu_flutter/utils/utils.dart';
+import 'package:openvidu_flutter/widgets/chat_screen.dart';
 import 'package:openvidu_flutter/widgets/custom_draggable.dart';
 import 'package:openvidu_flutter/widgets/participant_widget.dart';
 import 'package:openvidu_flutter_example/api/api_service.dart';
@@ -67,6 +68,17 @@ class _VideocallWidgetState extends State<VideocallWidget> {
     refresh();
   }
 
+  void _showMessages() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ChatScreen(
+          session: session!,
+        ),
+        fullscreenDialog: true,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -110,9 +122,14 @@ class _VideocallWidgetState extends State<VideocallWidget> {
     apiService.createSession().then((sessionId) {
       apiService.createToken().then((token) {
         session = Session(sessionId, token);
+        session?.messageStream.listen((message) {
+          setState(() {});
+        });
+
         session!.onNotifySetRemoteMediaStream = (String connectionId) {
           refresh();
         } as OnNotifySetRemoteMediaStreamEvent?;
+
         session!.onRemoveRemoteParticipant = (String connectionId) {
           refresh();
         } as OnRemoveRemoteParticipantEvent?;
@@ -367,6 +384,12 @@ class _VideocallWidgetState extends State<VideocallWidget> {
                 ? Icons.mic
                 : Icons.mic_off),
           ),
+          if ((session?.messages ?? []).isNotEmpty)
+            _noHeroFloatingActionButton(
+              onPressed: _showMessages,
+              tooltip: 'Messages',
+              icon: const Icon(Icons.message_sharp),
+            ),
         ],
       ),
     );

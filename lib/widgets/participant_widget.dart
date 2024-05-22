@@ -1,10 +1,8 @@
-import 'dart:convert';
-
-import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:openvidu_flutter/participant/participant.dart';
 import 'package:openvidu_flutter/participant/remote_participant.dart';
+import 'package:openvidu_flutter/utils/utils.dart';
 
 class ParticipantWidget extends StatefulWidget {
   final Participant participant;
@@ -107,18 +105,5 @@ class _ParticipantWidgetState extends State<ParticipantWidget> {
         ),
       ),
     );
-  }
-
-  Color getColorFromString(String input) {
-    // Hash the input string using SHA-256
-    var bytes = utf8.encode(input);
-    var digest = sha256.convert(bytes);
-
-    // Use the first 3 bytes of the hash to generate RGB values
-    int red = (digest.bytes[0] % 128) + 128; // 128-255
-    int green = (digest.bytes[1] % 128) + 128; // 128-255
-    int blue = (digest.bytes[2] % 128) + 128; // 128-255
-
-    return Color.fromARGB(255, red, green, blue);
   }
 }
