@@ -19,3 +19,7 @@ $ flutter run
 <p align="center">
 <img src="https://github.com/galanblancom/openvidu-flutter/blob/master/gif/openvidu-flutter-demo.gif?raw=true" width="800"/>
 </p>
+
+<p align="center">
+<img src="https://github.com/galanblancom/openvidu-flutter/blob/master/gif/chat-demo.gif?raw=true" width="800"/>
+</p>

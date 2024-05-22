@@ -5,7 +5,20 @@ import 'package:openvidu_flutter/utils/session.dart';
 
 class ChatScreen extends StatefulWidget {
   final Session session;
-  const ChatScreen({super.key, required this.session});
+  final Widget? title;
+  final Widget Function(Message)? chatBubble;
+  final InputDecoration? textFieldDecoration;
+
+  const ChatScreen({
+    super.key,
+    required this.session,
+    this.title = const Text('Chat'),
+    this.chatBubble,
+    this.textFieldDecoration = const InputDecoration(
+      hintText: 'Type a message',
+      border: OutlineInputBorder(),
+    ),
+  });
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -28,7 +41,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Chat'),
+        title: widget.title,
       ),
       body: Column(
         children: [
@@ -37,10 +50,13 @@ class _ChatScreenState extends State<ChatScreen> {
               reverse: true,
               itemCount: widget.session.messages.length,
               itemBuilder: (context, index) {
-                return ChatBubble(
-                  message: widget.session
-                      .messages[widget.session.messages.length - index - 1],
-                );
+                return widget.chatBubble == null
+                    ? ChatBubble(
+                        message: widget.session.messages[
+                            widget.session.messages.length - index - 1],
+                      )
+                    : widget.chatBubble!(widget.session
+                        .messages[widget.session.messages.length - index - 1]);
               },
             ),
           ),
@@ -51,10 +67,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 Expanded(
                   child: TextField(
                     controller: _controller,
-                    decoration: const InputDecoration(
-                      hintText: 'Type a message',
-                      border: OutlineInputBorder(),
-                    ),
+                    decoration: widget.textFieldDecoration,
                   ),
                 ),
                 IconButton(

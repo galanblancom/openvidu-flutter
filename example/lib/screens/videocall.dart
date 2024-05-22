@@ -384,12 +384,11 @@ class _VideocallWidgetState extends State<VideocallWidget> {
                 ? Icons.mic
                 : Icons.mic_off),
           ),
-          if ((session?.messages ?? []).isNotEmpty)
-            _noHeroFloatingActionButton(
-              onPressed: _showMessages,
-              tooltip: 'Messages',
-              icon: const Icon(Icons.message_sharp),
-            ),
+          _noHeroFloatingActionButton(
+            onPressed: _showMessages,
+            tooltip: 'Messages',
+            icon: const Icon(Icons.message_sharp),
+          ),
         ],
       ),
     );

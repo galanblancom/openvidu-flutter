@@ -37,6 +37,11 @@ All notable changes to the `OpenVidu Flutter` project will be documented in this
 ## [0.0.9] - 2024-05-21
 - Added chat support and chat screen in the example
 
+## [0.0.10] - 2024-05-22
+- Upgrade intl dependency.
+- Chat button is always visible now.
+- ChatBubble can be customized according to the user.
+
 ### Changed
 
 ### Deprecated

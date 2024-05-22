@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:openvidu_flutter/utils/session.dart';
 import 'participant.dart';
