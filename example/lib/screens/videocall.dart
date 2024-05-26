@@ -69,12 +69,19 @@ class _VideocallWidgetState extends State<VideocallWidget> {
   }
 
   void _showMessages() {
+    if ((session?.unreadMessages ?? 0) > 0) {
+      session?.messages.where((m) => !m.isReaded).forEach((msg) {
+        msg.isReaded = true;
+      });
+      setState(() {});
+    }
+
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => ChatScreen(
           session: session!,
         ),
-        fullscreenDialog: true,
+        fullscreenDialog: false,
       ),
     );
   }
@@ -129,7 +136,9 @@ class _VideocallWidgetState extends State<VideocallWidget> {
         session!.onNotifySetRemoteMediaStream = (String connectionId) {
           refresh();
         } as OnNotifySetRemoteMediaStreamEvent?;
-
+        session!.onAddRemoteParticipant = (String connectionId) {
+          refresh();
+        } as OnAddRemoteParticipantEvent?;
         session!.onRemoveRemoteParticipant = (String connectionId) {
           refresh();
         } as OnRemoveRemoteParticipantEvent?;
@@ -388,18 +397,36 @@ class _VideocallWidgetState extends State<VideocallWidget> {
             onPressed: _showMessages,
             tooltip: 'Messages',
             icon: const Icon(Icons.message_sharp),
+            badge: (session?.unreadMessages ?? 0) == 0
+                ? null
+                : Text(
+                    "${session?.unreadMessages}",
+                    style: const TextStyle(color: Colors.white, fontSize: 11.0),
+                  ),
           ),
         ],
       ),
     );
   }
 
-  Widget _noHeroFloatingActionButton({
-    required VoidCallback onPressed,
-    required String tooltip,
-    required Icon icon,
-    Color? backgroundColor,
-  }) {
+  Widget _noHeroFloatingActionButton(
+      {required VoidCallback onPressed,
+      required String tooltip,
+      required Icon icon,
+      Color? backgroundColor,
+      Widget? badge}) {
+    if (badge != null) {
+      return Badge(
+        label: badge,
+        child: FloatingActionButton(
+          onPressed: onPressed,
+          tooltip: tooltip,
+          backgroundColor: backgroundColor,
+          child: icon,
+        ),
+      );
+    }
+
     return FloatingActionButton(
       heroTag: null,
       onPressed: onPressed,

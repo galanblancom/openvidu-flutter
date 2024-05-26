@@ -30,8 +30,10 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
+
     widget.session.messageStream.listen((message) {
       if (mounted) {
+        message.isReaded = true;
         setState(() {});
       }
     });
@@ -117,8 +119,9 @@ class ChatBubble extends StatelessWidget {
             Text(
               DateFormat('hh:mm a').format(message.time),
               style: TextStyle(
-                  color: message.isMe ? Colors.white70 : Colors.black54,
-                  fontSize: 10),
+                color: message.isMe ? Colors.white70 : Colors.black54,
+                fontSize: 10,
+              ),
             ),
           ],
         ),

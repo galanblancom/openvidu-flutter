@@ -42,6 +42,11 @@ All notable changes to the `OpenVidu Flutter` project will be documented in this
 - Chat button is always visible now.
 - ChatBubble can be customized according to the user.
 
+## [0.0.11] - 2024-05-24
+- Added flag isReaded to messages.
+- Added onAddRemoteParticipant to the Session object.
+
+
 ### Changed
 
 ### Deprecated

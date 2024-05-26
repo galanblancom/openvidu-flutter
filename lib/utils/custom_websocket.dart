@@ -431,7 +431,9 @@ class CustomWebSocket {
     }
     final remoteParticipant =
         RemoteParticipant(connectionId, participantName, session);
-
+    if (session.onAddRemoteParticipant != null) {
+      session.onAddRemoteParticipant!(connectionId);
+    }
     session.createRemotePeerConnection(remoteParticipant.connectionId!);
     return remoteParticipant;
   }
