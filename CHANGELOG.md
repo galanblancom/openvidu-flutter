@@ -43,9 +43,11 @@ All notable changes to the `OpenVidu Flutter` project will be documented in this
 - ChatBubble can be customized according to the user.
 
 ## [0.0.11] - 2024-05-24
-- Added flag isReaded to messages.
+- Added isReaded flag to Message object.
 - Added onAddRemoteParticipant to the Session object.
 
+## [0.0.12] - 2024-08-19
+- Support up-to-date dependencies
 
 ### Changed
 
