@@ -49,6 +49,24 @@ All notable changes to the `OpenVidu Flutter` project will be documented in this
 ## [0.0.12] - 2024-08-19
 - Support up-to-date dependencies
 
+## [0.0.13] - 2025-09-28
+
+### Changed
+- Updated Android Gradle Plugin from 7.3.0 → 8.6.1
+- Updated Kotlin version from 1.7.10 → 2.1.0
+- Updated Gradle version from 7.6.3 → 8.7
+- Updated compileSdk from flutter.compileSdkVersion → 36
+- Updated targetSdkVersion from flutter.targetSdkVersion → 36
+- Enhanced JVM arguments with better memory management
+- Added compatibility flags for Android builds
+- Enabled Gradle caching and parallel builds for better performance
+
+### Fixed
+- Resolved Kotlin compilation errors in Flutter tools
+- Fixed compatibility issues between Flutter version and build tools
+- Addressed plugin compatibility warnings (flutter_webrtc, path_provider_android, shared_preferences_android)
+
+
 ### Changed
 
 ### Deprecated
