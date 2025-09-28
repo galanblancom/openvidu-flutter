@@ -292,7 +292,7 @@ class CustomWebSocket {
   }
 
   /// Sends the sendMessage to the WebSocket server
-  sendMessage(String message, String nickname) {
+  void sendMessage(String message, String nickname) {
     final Map<String, String> sendMessageParams = {
       'message':
           "{\"to\":[],\"data\":\"{\\\"message\\\":\\\"$message\\\",\\\"nickname\\\":\\\"$nickname\\\"}\",\"type\":\"signal:chat\"}",

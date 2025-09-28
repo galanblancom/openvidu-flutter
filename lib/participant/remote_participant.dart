@@ -13,7 +13,7 @@ class RemoteParticipant extends Participant {
     session.addRemoteParticipant(this);
   }
 
-  changeCameraStatus(bool newValue) {
+  void changeCameraStatus(bool newValue) {
     mediaStream?.getVideoTracks().forEach((element) {
       element.enabled = newValue;
     });
@@ -21,7 +21,7 @@ class RemoteParticipant extends Participant {
     isVideoActive = newValue;
   }
 
-  changeMicrophoneStatus(bool newValue) {
+  void changeMicrophoneStatus(bool newValue) {
     mediaStream?.getAudioTracks().forEach((element) {
       element.enabled = newValue;
     });

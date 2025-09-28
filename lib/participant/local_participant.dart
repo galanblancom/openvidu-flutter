@@ -18,21 +18,21 @@ class LocalParticipant extends Participant {
     }
   }
 
-  toggleVideo() {
+  void toggleVideo() {
     if (videoTrack != null) {
       videoTrack!.enabled = !videoTrack!.enabled;
       isVideoActive = videoTrack!.enabled;
     }
   }
 
-  toggleAudio() {
+  void toggleAudio() {
     if (audioTrack != null) {
       audioTrack!.enabled = !audioTrack!.enabled;
       isAudioActive = audioTrack!.enabled;
     }
   }
 
-  sendMessage(String message) {
+  void sendMessage(String message) {
     session.websocket.sendMessage(message, participantName);
   }
 
@@ -70,7 +70,7 @@ class LocalParticipant extends Participant {
         devices.where((device) => device.kind == 'videoinput').toList();
 
     // Match the track with the devices
-    for (var device in videoDevices) {
+    for (MediaDeviceInfo device in videoDevices) {
       if (device.deviceId == videoTrack?.getSettings()["deviceId"]) {
         // Check if the device label contains "front" or "back"
         if (device.label.toLowerCase().contains('front')) {

@@ -87,7 +87,7 @@ class _ParticipantWidgetState extends State<ParticipantWidget> {
   }
 
   Widget _noVideoPlaceholder(String participantName) {
-    var randomColor = getColorFromString(participantName);
+    Color randomColor = getColorFromString(participantName);
     return Center(
       child: Container(
         width: 50.0,

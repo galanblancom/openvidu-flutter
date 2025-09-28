@@ -17,8 +17,8 @@ Color getRandomLightColor() {
 /// Generates a color from a given string
 Color getColorFromString(String input) {
   // Hash the input string using SHA-256
-  var bytes = utf8.encode(input);
-  var digest = sha256.convert(bytes);
+  List<int> bytes = utf8.encode(input);
+  Digest digest = sha256.convert(bytes);
 
   // Use the first 3 bytes of the hash to generate RGB values
   int red = (digest.bytes[0] % 128) + 128; // 128-255

@@ -6,52 +6,19 @@ All notable changes to the `OpenVidu Flutter` project will be documented in this
 
 - Initial planning and design.
 
-## [0.0.1] - 2024-05-20
+## [0.0.14] - 2024-09-28
 
-### Added
-- Participant names are now displayed for each remote participant.
-- Managing changes in the flow of remote participants.
-- The status of the participant's microphone and camera is displayed.
+### Fixed
 
-## [0.0.2] - 2024-05-20
-- Fixed Warnings
+- Added missing type annotations across all source files
+- Fixed missing return types for methods in RemoteParticipant, CustomWebSocket, and ApiClient
+- Improved type safety with explicit variable declarations
+- Enhanced code maintainability and IDE support
 
-## [0.0.3] - 2024-05-20
-- Image url fixed
-
-## [0.0.4] - 2024-05-20
-- Refactorizations
-
-## [0.0.5] - 2024-05-20
-- Fixed homepage url
-
-## [0.0.6] - 2024-05-21
-- Added support for bad certificate
-
-## [0.0.7] - 2024-05-21
-- Added support for a customClient in websocket
-
-## [0.0.8] - 2024-05-21
-- Added some documentation
-
-## [0.0.9] - 2024-05-21
-- Added chat support and chat screen in the example
-
-## [0.0.10] - 2024-05-22
-- Upgrade intl dependency.
-- Chat button is always visible now.
-- ChatBubble can be customized according to the user.
-
-## [0.0.11] - 2024-05-24
-- Added isReaded flag to Message object.
-- Added onAddRemoteParticipant to the Session object.
-
-## [0.0.12] - 2024-08-19
-- Support up-to-date dependencies
-
-## [0.0.13] - 2025-09-28
+## [0.0.13] - 2024-09-28
 
 ### Changed
+
 - Updated Android Gradle Plugin from 7.3.0 → 8.6.1
 - Updated Kotlin version from 1.7.10 → 2.1.0
 - Updated Gradle version from 7.6.3 → 8.7
@@ -61,18 +28,85 @@ All notable changes to the `OpenVidu Flutter` project will be documented in this
 - Added compatibility flags for Android builds
 - Enabled Gradle caching and parallel builds for better performance
 
-### Fixed
+### Build System Updates
+
 - Resolved Kotlin compilation errors in Flutter tools
 - Fixed compatibility issues between Flutter version and build tools
 - Addressed plugin compatibility warnings (flutter_webrtc, path_provider_android, shared_preferences_android)
 
+## [0.0.12] - 2024-08-19
 
 ### Changed
 
-### Deprecated
+- Support up-to-date dependencies
 
-### Removed
+## [0.0.11] - 2024-05-24
+
+### Added
+
+- Added isReaded flag to Message object
+- Added onAddRemoteParticipant to the Session object
+
+## [0.0.10] - 2024-05-22
+
+### Changed
+
+- Upgrade intl dependency
+- Chat button is always visible now
+- ChatBubble can be customized according to the user
+
+## [0.0.9] - 2024-05-21
+
+### Added
+
+- Added chat support and chat screen in the example
+
+## [0.0.8] - 2024-05-21
+
+### Added
+
+- Added some documentation
+
+## [0.0.7] - 2024-05-21
+
+### Added
+
+- Added support for a customClient in websocket
+
+## [0.0.6] - 2024-05-21
+
+### Added
+
+- Added support for bad certificate
+
+## [0.0.5] - 2024-05-20
 
 ### Fixed
 
-### Security
+- Fixed homepage url
+
+## [0.0.4] - 2024-05-20
+
+### Changed
+
+- Refactorizations
+
+## [0.0.3] - 2024-05-20
+
+### Fixed
+
+- Image url fixed
+
+## [0.0.2] - 2024-05-20
+
+### Fixed
+
+- Fixed Warnings
+
+## [0.0.1] - 2024-05-20
+
+### Added
+
+- Participant names are now displayed for each remote participant
+- Managing changes in the flow of remote participants
+- The status of the participant's microphone and camera is displayed

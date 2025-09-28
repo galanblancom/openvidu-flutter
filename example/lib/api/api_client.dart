@@ -5,12 +5,12 @@ import 'dart:io';
 import 'package:logging/logging.dart';
 import 'request_config.dart';
 
-var _logger = Logger('ApiClient');
+Logger _logger = Logger('ApiClient');
 
 class ApiClient {
   final HttpClient client = HttpClient();
 
-  setBadCertificateCallBack(
+  void setBadCertificateCallBack(
       bool Function(X509Certificate, String, int)? callback) {
     client.badCertificateCallback = callback;
   }
